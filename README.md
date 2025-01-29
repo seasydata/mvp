@@ -1,3 +1,15 @@
+## Contributing
+
+Use "{user}/{branch-purpose}" as branch names, e.g. "ianmaks/updating-readme".
+
+When contributing, first run prettier on local feature branch:
+
+```
+npx prettier . --write
+```
+
+Then pull main and rebase feature on main, before pushing feature and creating a pull request.
+
 # Create T3 App
 
 This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
@@ -28,6 +40,6 @@ You can check out the [create-t3-app GitHub repository](https://github.com/t3-os
 
 Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
 
-
 ## TODO's
+
 Wrap ClerkProvider around app when development starts
