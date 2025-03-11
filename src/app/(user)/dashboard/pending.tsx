@@ -42,7 +42,7 @@ export default async function Pending({ records }: { records: EmissionRecord[] }
     return (
         <>
             <div className="flex flex-row items-center space-x-10  pt-10">
-                <div className='font-bold pt-10'>
+                <div className='font-bold'>
                     PENDING REQUESTS
                 </div>
                 <div className='ml-10'>

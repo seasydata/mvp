@@ -1,8 +1,30 @@
 import { z } from "zod";
 import { publicProcedure, protectedProcedure, createTRPCRouter } from "../../trpc";
-import type {EmissionRecord} from "~/server/types";
+import type {EmissionRecord, Product} from "~/server/types";
+import { supabase } from "~/server/supabase";
+
+
+export type EnrichedEmissionRecord = EmissionRecord & {
+  Product: Pick<Product, "name" | "id">;
+};
 
 export const emissionRecordRouter = createTRPCRouter({
+
+  getWithToken: publicProcedure
+  .input(z.object({
+    emissionRecordId: z.string(), 
+    // token: z.string()
+  }))
+  .query(async ({ctx, input}) => {
+    console.log("Received emissionRecordId:", input.emissionRecordId); // Debug log
+
+    const {data, error} = await ctx.supabase.from("EmissionRecord").select("*").eq("id", input.emissionRecordId).single();
+    console.log(data)
+    if (error) {
+      throw new Error(error.message);
+    }
+    return data as EmissionRecord
+  }),
 
   getAll: publicProcedure
   .query(async ({ ctx }) => {

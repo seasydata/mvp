@@ -100,7 +100,7 @@ export default function PurchaseRecordDialog({ organizations, products }:
                         </label>
                     ))}
                 </div>
-                <div className='flex flex-col flex-grow gap-2 mt-2 overflow-y-auto max-h-full bg-red-200 '>
+                <div className='flex flex-col flex-grow gap-2 mt-2 overflow-y-scroll  bg-red-200 '>
                     <DataTable columns={columns} data={filteredProducts} />
                 </div>
             </div>

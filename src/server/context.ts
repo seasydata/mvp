@@ -3,7 +3,7 @@ import { supabase } from './supabase'
 
 export const createContext = async () => {
 const authObj = await auth();
-console.log(authObj);
+// console.log(authObj);
   return { auth: authObj, supabase: supabase }
 }
 
