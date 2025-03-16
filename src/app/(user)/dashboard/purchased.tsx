@@ -4,7 +4,7 @@ import type { ColumnDef } from "@tanstack/react-table";
 import type { EnrichedPurchaseRecord } from "~/server/api/routers/purchaserecords";
 import PurchaseRecordDialog from "~/components/dashboard/PurchaseRecordDialog";
 import { helper } from "~/app/_trpc/helper";
-import type { EnrichedOrganization } from "~/server/api/routers/organization";
+import type { EnrichedOrganization } from "~/server/api/routers/organizations";
 import type { EnrichedProduct } from "~/server/api/routers/products";
 
 const columns: ColumnDef<EnrichedPurchaseRecord>[] = [
@@ -25,19 +25,17 @@ const columns: ColumnDef<EnrichedPurchaseRecord>[] = [
         header: "Date Purchased",
     },
     {
-        accessorKey: "quantityValue",
+        accessorKey: "quantity",
         header: "Quantity",
 
     },
-    {
-        accessorKey: "quantityUnit",
-        header: "Unit",
-    }
 ];
 
-export default async function Purchases({ records }: { records: EnrichedPurchaseRecord[] }) {
+export default async function Purchases() {
     // console.log(records);
-    const transformedRecords = records.map(record => ({
+    const purchaseRecords: EnrichedPurchaseRecord[] = await helper.purchaseRecord.getFiltered.fetch();
+
+    const transformedRecords = purchaseRecords.map(record => ({
         ...record,
         supplierName: record.Organization.name,
         supplierCountry: record.Organization.country,
@@ -46,10 +44,12 @@ export default async function Purchases({ records }: { records: EnrichedPurchase
         purchaseDate: record.purchaseDate.slice(0, 10)
     }))
     const organizations: EnrichedOrganization[] = await helper.organization.getFiltered.fetch();
+    // console.log(organizations)
     const products: EnrichedProduct[] = await helper.product.getFiltered.fetch();
+
     const transformedProducts = products.map(product => ({
         ...product,
-        supplierName: product.Organization.name,
+        // supplierName: product.Organization.name,
     }))
     // console.log(organizations);
     return (

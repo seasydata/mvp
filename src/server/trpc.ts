@@ -2,13 +2,14 @@ import { auth } from "@clerk/nextjs/server";
 import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 import type { Context } from "./context";
+import { supabase } from "./supabase";
 
-export const createTRPCContext = async () => {
+export const createTRPCContext = async (opts: CreateNextContextOptions) => {
 
   return { supabase: supabase, auth: await auth()};
 };
 
-const t = initTRPC.context< Context>().create({
+const t = initTRPC.context<Context>().create({
   transformer: superjson,
   errorFormatter({ shape }) {
     return shape;

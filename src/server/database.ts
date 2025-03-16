@@ -36,34 +36,40 @@ export type Database = {
     Tables: {
       EmissionRecord: {
         Row: {
+          calculationMethod: string | null
+          CO2e: number
+          comment: string | null
           createdAt: string
           id: string
           productId: string
-          quantityUnit: string
-          quantityValue: number
           recordDate: string
+          source: string | null
           status: string
-          updatedAt: string
+          updatedAt: string | null
         }
         Insert: {
+          calculationMethod?: string | null
+          CO2e: number
+          comment?: string | null
           createdAt?: string
           id?: string
           productId: string
-          quantityUnit: string
-          quantityValue: number
           recordDate: string
+          source?: string | null
           status: string
-          updatedAt: string
+          updatedAt?: string | null
         }
         Update: {
+          calculationMethod?: string | null
+          CO2e?: number
+          comment?: string | null
           createdAt?: string
           id?: string
           productId?: string
-          quantityUnit?: string
-          quantityValue?: number
           recordDate?: string
+          source?: string | null
           status?: string
-          updatedAt?: string
+          updatedAt?: string | null
         }
         Relationships: [
           {
@@ -80,6 +86,7 @@ export type Database = {
           authId: string | null
           country: string | null
           createdAt: string
+          email: string
           id: string
           name: string
           organizationNumber: number | null
@@ -89,6 +96,7 @@ export type Database = {
           authId?: string | null
           country?: string | null
           createdAt?: string
+          email: string
           id?: string
           name: string
           organizationNumber?: number | null
@@ -98,6 +106,7 @@ export type Database = {
           authId?: string | null
           country?: string | null
           createdAt?: string
+          email?: string
           id?: string
           name?: string
           organizationNumber?: number | null
@@ -120,7 +129,7 @@ export type Database = {
           contactName?: string | null
           createdAt?: string
           customerOrgId: string
-          id: string
+          id?: string
           supplierOrgId: string
           updatedAt: string
         }
@@ -152,36 +161,33 @@ export type Database = {
       }
       Product: {
         Row: {
-          calculationMethod: string
+          comment: string | null
           createdAt: string
-          emissionUnit: string
-          emissionValue: number
+          description: string | null
           id: string
           name: string
           organizationId: string
-          description: string | null
+          unit: string
           updatedAt: string
         }
         Insert: {
-          calculationMethod: string
+          comment?: string | null
           createdAt?: string
-          emissionUnit: string
-          emissionValue: number
+          description?: string | null
           id?: string
           name: string
           organizationId: string
-          description?: string | null
+          unit: string
           updatedAt: string
         }
         Update: {
-          calculationMethod?: string
+          comment?: string | null
           createdAt?: string
-          emissionUnit?: string
-          emissionValue?: number
+          description?: string | null
           id?: string
           name?: string
           organizationId?: string
-          description?: string | null
+          unit?: string
           updatedAt?: string
         }
         Relationships: [
@@ -196,37 +202,37 @@ export type Database = {
       }
       PurchaseRecord: {
         Row: {
+          comment: string | null
           createdAt: string
           customerOrgId: string
           id: string
           productId: string
           purchaseDate: string
-          quantityUnit: string
-          quantityValue: number
+          quantity: number
           supplierOrgId: string
-          updatedAt: string
+          updatedAt: string | null
         }
         Insert: {
+          comment?: string | null
           createdAt?: string
           customerOrgId: string
           id?: string
           productId: string
           purchaseDate: string
-          quantityUnit: string
-          quantityValue: number
+          quantity: number
           supplierOrgId: string
-          updatedAt: string
+          updatedAt?: string | null
         }
         Update: {
+          comment?: string | null
           createdAt?: string
           customerOrgId?: string
           id?: string
           productId?: string
           purchaseDate?: string
-          quantityUnit?: string
-          quantityValue?: number
+          quantity?: number
           supplierOrgId?: string
-          updatedAt?: string
+          updatedAt?: string | null
         }
         Relationships: [
           {
@@ -254,25 +260,25 @@ export type Database = {
       }
       User: {
         Row: {
-          authId: string
+          authId: string | null
           createdAt: string
           email: string
           id: string
-          updatedAt: string
+          updatedAt: string | null
         }
         Insert: {
-          authId: string
+          authId?: string | null
           createdAt?: string
           email: string
-          id: string
-          updatedAt: string
+          id?: string
+          updatedAt?: string | null
         }
         Update: {
-          authId?: string
+          authId?: string | null
           createdAt?: string
           email?: string
           id?: string
-          updatedAt?: string
+          updatedAt?: string | null
         }
         Relationships: []
       }
@@ -280,31 +286,31 @@ export type Database = {
         Row: {
           createdAt: string
           id: string
-          OrganizationId: string | null
+          organizationId: string | null
           role: string
-          updatedAt: string
+          updatedAt: string | null
           userId: string
         }
         Insert: {
           createdAt?: string
-          id: string
-          OrganizationId?: string | null
+          id?: string
+          organizationId?: string | null
           role: string
-          updatedAt: string
+          updatedAt?: string | null
           userId: string
         }
         Update: {
           createdAt?: string
           id?: string
-          OrganizationId?: string | null
+          organizationId?: string | null
           role?: string
-          updatedAt?: string
+          updatedAt?: string | null
           userId?: string
         }
         Relationships: [
           {
-            foreignKeyName: "UserOrganization_OrganizationId_fkey"
-            columns: ["OrganizationId"]
+            foreignKeyName: "UserOrganization_organizationId_fkey"
+            columns: ["organizationId"]
             isOneToOne: false
             referencedRelation: "Organization"
             referencedColumns: ["id"]

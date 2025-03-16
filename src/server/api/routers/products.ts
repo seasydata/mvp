@@ -1,8 +1,13 @@
+import { currentUser } from "@clerk/nextjs/server";
 import { publicProcedure, createTRPCRouter, protectedProcedure } from "../../trpc";
-import type { Organization, Product } from "~/server/types";
+import type { Organization, OrgRelation, Product, User, UserOrganization } from "~/server/types";
 
 export type EnrichedProduct = Product & {
-  Organization: Pick<Organization, "name" | "id">;
+  Organization: Pick<Organization, "name" | "id">,
+  Supplier: Pick<Organization, "id" | "name">;
+  OrgRelation: Pick<OrgRelation, "supplierOrgId" | "customerOrgId">;
+  Customer: Pick<Organization, "id" | "name">;
+  UserOrganization: Pick<UserOrganization, "userId" | "organizationId">;
 };
 
 
@@ -18,30 +23,34 @@ export const productRouter = createTRPCRouter({
   }),
 
   getFiltered: publicProcedure.query(async({ctx}) => {
-    const {data, error} = await ctx.supabase
-    .from("OrgRelation")
-    .select(`customerOrgId, supplierOrgId`)
-    .eq('customerOrgId', "46cb01fa-e136-4de3-ab3f-074a244c88eb");
-    if (error) {
-      throw new Error(error.message);
+    const clerkUser = await currentUser();
+    if (!clerkUser) {
+      throw new Error("No active Clerk session");
     }
-
-    const supplierIds = data?.map(relation => relation.supplierOrgId) ?? [];
-
-    if (supplierIds.length > 0) {
-        const {data: products, error: productsError} = await ctx.supabase
-        .from("Product")
-        .select(`
-          *,
-          Organization(name)
-          `)
-        .in("organizationId", supplierIds);
-        if (productsError) {
-            console.error("Failed to fetch products from suppliers", productsError);
-        } else {
-            return products as EnrichedProduct[]; 
-        }
+    
+    const {data: supaUser, error: userError} = await ctx.supabase
+    .from("User")
+    .select("*")
+    .eq("authId", clerkUser.id)
+    .single<User>();
+    if (!supaUser || userError) {
+      throw new Error("User not activated")
     }
-    return [] as EnrichedProduct[];
+    
+    const { data: products, error: queryError } = await ctx.supabase
+      .from("Product")
+      .select(`
+        *, Supplier:Organization!inner!organizationId(
+        *, OrgRelation!inner!supplierOrgId(
+        *, Customer:Organization!inner!customerOrgId(
+        *, UserOrganization!inner!organizationId(
+        *))))
+      `)
+      .eq("Supplier.OrgRelation.Customer.UserOrganization.userId", supaUser.id)
+
+    if (queryError) {
+      throw new Error(queryError.message);
+    }
+    return products as EnrichedProduct[];
   })
 });

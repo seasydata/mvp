@@ -4,7 +4,7 @@ import {
   createTRPCRouter,
   createCallerFactory,
 } from "../../trpc";
-import { organizationRouter } from "./organization";
+import { organizationRouter } from "./organizations";
 import { productRouter } from "./products";
 
 export const appRouter = createTRPCRouter({

@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { httpBatchLink } from "@trpc/client";
 import { useState } from "react";
 import { TRPCProvider } from "@trpc/react-query/shared";
+import Header from "@/components/header";
 
 import {
   ClerkProvider,
@@ -33,6 +34,7 @@ const geistMono = Geist_Mono({
 
 import SuperJSON from "superjson";
 import "~/styles/globals.css";
+import Footer from "~/components/footer";
 
 export default function RootLayout({
   children,
@@ -49,47 +51,19 @@ export default function RootLayout({
   );
   return (
     <ClerkProvider >
-        <trpc.Provider client={trpcClient} queryClient={queryClient}>
+      <trpc.Provider client={trpcClient} queryClient={queryClient}>
         <QueryClientProvider client={queryClient}>
           <html lang="en">
             <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-              <header className="flex justify-center h-24 bg-neutral-100">
-                <div className='flex justify-between items-center w-4/5'>
-                  <div className='flex mr-auto'>
-                    <Link href={"/"}>
-                      <Image width='96' height='32' src="/images/logo.png" alt="Seasy Data Logo" />
-                    </Link>
-                  </div>
-                  <div className='flex mx-auto items-center justify-between gap-16'>
-                    <Link href='/dashboard' className='text-1xl font-sans font-semibold text-cyan-950'>PRODUCT</Link>
-                    <Link href='/dashboard' className='text-1xl font-sans font-semibold text-cyan-950'>ABOUT US</Link>
-                    <Link href='/dashboard' className='text-1xl font-sans font-semibold text-cyan-950'>NEWS AND ARTICLES</Link>
-                  </div>
-
-                  <div className='flex ml-auto gap-4'>
-                    <SignedOut>
-                      <SignInButton>
-                        <Button className='bg-transparent border-4 border-slate-300 hover:bg-slate-300 text-slate-700 font-sans rounded-none' size='lg'>LOGIN</Button>
-                      </SignInButton>
-                      <SignUpButton>
-                        <Button size='lg'>Sign up</Button>
-                      </SignUpButton>
-                    </SignedOut>
-                    <SignedIn>
-                      Hello
-                      <UserButton />
-                    </SignedIn>
-                  </div>
-                </div>
-              </header>
-              <main className="w-4/5 mx-auto">
+              <Header />
+              <main className="w-4/5 mx-auto" style={{ height: 'calc(100vh - 6rem)' }}>
                 {children}
               </main>
-              <footer>footer</footer>
+              <Footer />
             </body>
           </html>
         </QueryClientProvider>
-        </trpc.Provider>
+      </trpc.Provider>
     </ClerkProvider >
   );
 }
