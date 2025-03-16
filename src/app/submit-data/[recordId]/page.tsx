@@ -25,9 +25,9 @@ const formSchema = z.object({
 })
 
 // { onClose }: { onClose: () => void }
-export default function DataSubmission({ emissionRecordId }: { emissionRecordId: string }) {
+export default function DataSubmission({ params, }: { params: { emissionRecordId: string }) {
 
-    const { data: emissionRecord, isLoading, isError } = trpc.emissionRecord.getWithToken.useQuery({ emissionRecordId: "" });
+    const { data: emissionRecord, isLoading, isError } = trpc.emissionRecord.getWithToken.useQuery({ emissionRecordId: params.emissionRecordId });
 
 
     const form = useForm<z.infer<typeof formSchema>>({
