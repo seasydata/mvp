@@ -4,22 +4,11 @@ import { trpc } from "../server/api/trpc/client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { httpBatchLink } from "@trpc/client";
 import { useState } from "react";
-import { TRPCProvider } from "@trpc/react-query/shared";
 
 
 import {
   ClerkProvider,
-  SignInButton,
-  SignUpButton,
-  SignedIn,
-  SignedOut,
-  UserButton,
 } from '@clerk/nextjs'
-
-import Link from 'next/link'
-import Image from 'next/image'
-
-import { Button } from "../components/ui/button"
 import { Geist, Geist_Mono } from 'next/font/google'
 
 const geistSans = Geist({
@@ -34,9 +23,9 @@ const geistMono = Geist_Mono({
 
 import SuperJSON from "superjson";
 import "~/styles/globals.css";
-import Footer from "./components/footer";
-import Navbar from "./components/header/navbar";
-import DevBanner from "./components/header/dev-banner";
+import Navbar from "~/components/header/navbar";
+import DevBanner from "~/components/header/dev-banner";
+import Footer from "~/components/footer";
 
 export default function RootLayout({
   children,

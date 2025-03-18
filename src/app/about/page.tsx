@@ -1,10 +1,10 @@
 import React from "react";
-import Navbar from "../components/header/navbar";
-import Footer from "../components/footer";
-import WelcomeHeader from "~/app/components/styles/welcome-header";
-import Content1 from "~/app/components/about/content1";
-import Content2 from "~/app/components/about/content2";
-import Content3 from "~/app/components/about/content3";
+import Navbar from "../../components/header/navbar";
+import Footer from "../../components/footer";
+import WelcomeHeader from "~/components/styles/welcome-header";
+import Content1 from "~/components/about/content1";
+import Content2 from "~/components/about/content2";
+import Content3 from "~/components/about/content3";
 
 export default function AboutPage() {
   return (

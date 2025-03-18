@@ -1,8 +1,6 @@
 import React from "react";
-import Navbar from "../components/header/navbar";
-import Footer from "../components/footer";
-import WelcomeHeader from "~/app/components/styles/welcome-header";
-import Content1 from "~/app/components/contact-us/content1";
+import WelcomeHeader from "~/components/styles/welcome-header";
+import Content1 from "~/components/contact-us/content1";
 
 // NOTE: currently not in use!
 

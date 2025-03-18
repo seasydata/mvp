@@ -3,14 +3,11 @@
 // src/App.tsx
 import React from "react";
 
-import Navbar from "./components/header/navbar";
-import DevBanner from "./components/header/dev-banner";
-import HeroSection from "./components/hero-section";
-import AboutSection from "./components/about-section";
-import Footer from "./components/footer";
-import ContactUsSection from "./components/contact-us-section";
-import ContributionSection from "./components/contribution-section";
-import PartnersSection from "./components/partners-section";
+import HeroSection from "~/components/hero-section";
+import AboutSection from "~/components/about-section";
+import ContactUsSection from "~/components/contact-us-section";
+import ContributionSection from "~/components/contribution-section";
+import PartnersSection from "~/components/partners-section";
 
 export default function App() {
   return (
