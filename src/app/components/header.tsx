@@ -8,18 +8,21 @@ import {
 import Link from 'next/link'
 import Image from 'next/image'
 import { Button } from './ui/button'
+import CustomButton from "./styles/custom-button";
+import { useRouter } from 'next/router';
+
 
 
 
 export default function Header() {
-
+    const router = useRouter();
 
     return (
         <header className="flex justify-center h-24 bg-neutral-200">
             <div className='flex justify-between items-center w-4/5'>
                 <div className='flex mr-auto'>
                     <Link href={"/"}>
-                        <Image width='96' height='32' src="/images/images/logo.png" alt="Seasy Data Logo" />
+                        <Image width='96' height='32' src="/images/logo.png" alt="Seasy Data Logo" />
                     </Link>
                 </div>
                 <SignedIn>
@@ -38,11 +41,8 @@ export default function Header() {
                 <div className='flex ml-auto gap-4'>
                     <SignedOut>
                         <SignInButton>
-                            <Button className='bg-transparent border-4 border-slate-300 hover:bg-slate-300 text-slate-700 font-sans rounded-none' size='lg'>LOGIN</Button>
+                            {/* <Button className='bg-transparent border-4 border-slate-300 hover:bg-slate-300 text-slate-700 font-sans rounded-none' size='lg'>LOGIN</Button> */}
                         </SignInButton>
-                        <SignUpButton>
-                            <Button size='lg'>Sign up</Button>
-                        </SignUpButton>
                     </SignedOut>
                     <SignedIn>
                         Hello
