@@ -1,4 +1,4 @@
-"use client";
+"use server";
 
 // src/App.tsx
 import React from "react";
@@ -9,7 +9,7 @@ import ContactUsSection from "~/components/contact-us-section";
 import ContributionSection from "~/components/contribution-section";
 import PartnersSection from "~/components/partners-section";
 
-export default function App() {
+export default async function App() {
   return (
     <div className="min-h-screen flex flex-col justify-center items-center w-full bg-white">
       {/* Main Content */}
