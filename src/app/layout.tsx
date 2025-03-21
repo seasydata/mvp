@@ -4,24 +4,10 @@ import { trpc } from "../server/api/trpc/client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { httpBatchLink } from "@trpc/client";
 import { useState } from "react";
-import { TRPCProvider } from "@trpc/react-query/shared";
-import Header from "@/components/header";
-
-import {
-  ClerkProvider,
-  SignInButton,
-  SignUpButton,
-  SignedIn,
-  SignedOut,
-  UserButton,
-} from '@clerk/nextjs'
-
-import Link from 'next/link'
-import Image from 'next/image'
-
-import { Button } from "../components/ui/button"
+import { ClerkProvider } from '@clerk/nextjs'
 import { Geist, Geist_Mono } from 'next/font/google'
-
+import SuperJSON from "superjson";
+import "~/styles/globals.css";
 const geistSans = Geist({
   variable: '--font-geist-sans',
   subsets: ['latin'],
@@ -32,9 +18,6 @@ const geistMono = Geist_Mono({
   subsets: ['latin'],
 })
 
-import SuperJSON from "superjson";
-import "~/styles/globals.css";
-import Footer from "~/components/footer";
 
 export default function RootLayout({
   children,
@@ -54,12 +37,10 @@ export default function RootLayout({
       <trpc.Provider client={trpcClient} queryClient={queryClient}>
         <QueryClientProvider client={queryClient}>
           <html lang="en">
-            <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-              <Header />
-              <main className="w-4/5 mx-auto" style={{ height: 'calc(100vh - 6rem)' }}>
+            <body className={`${geistSans.variable} ${geistMono.variable} antialiased font-sans`}>
+              <main style={{ height: 'calc(100vh - 6rem)' }}>
                 {children}
               </main>
-              <Footer />
             </body>
           </html>
         </QueryClientProvider>

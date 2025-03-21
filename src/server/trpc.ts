@@ -1,13 +1,7 @@
-import { auth } from "@clerk/nextjs/server";
 import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 import type { Context } from "./context";
-import { supabase } from "./supabase";
-
-export const createTRPCContext = async (opts: CreateNextContextOptions) => {
-
-  return { supabase: supabase, auth: await auth()};
-};
+import { currentUser } from "@clerk/nextjs/server";
 
 const t = initTRPC.context<Context>().create({
   transformer: superjson,
@@ -16,12 +10,13 @@ const t = initTRPC.context<Context>().create({
   },
 });
 
-const isAuthed = t.middleware(({next, ctx}) => {
-  // console.log(ctx)
-  if (!ctx.auth.userId) {
-    throw new TRPCError({code: 'UNAUTHORIZED'})
+const isAuthed = t.middleware(async ({next, ctx}) => {
+
+  const clerkUser = await currentUser();
+  if (!clerkUser) {
+    throw new Error("No active Clerk session");
   }
-  return next({ctx: {auth: ctx.auth, supabase: ctx.supabase}})
+  return next({ctx: {user: clerkUser, supabase: ctx.supabase}})
 })
 
 export const createCallerFactory = t.createCallerFactory;
