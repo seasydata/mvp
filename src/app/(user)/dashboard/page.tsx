@@ -3,7 +3,7 @@
 import { type EnrichedEmissionRecord } from "~/server/api/routers/emissionrecords";
 import EmissionRecords from "./emissionrecords";
 import PurchaseRecords from "./purchaserecords";
-import { helper } from "@/app/_trpc/helper";
+import { helper } from "~/app/_trpc/helper";
 import { type EnrichedPurchaseRecord } from "~/server/api/routers/purchaserecords";
 import Stats from "./stats";
 

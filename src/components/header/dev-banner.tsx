@@ -1,3 +1,4 @@
+"use client"
 import { useState } from "react";
 import { X } from "lucide-react";
 import BodyText from "../styles/body-text";
