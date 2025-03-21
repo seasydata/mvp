@@ -1,11 +1,16 @@
 import { helper } from "~/app/_trpc/helper";
+import { EnrichedEmissionRecord } from "~/server/api/routers/emissionrecords";
+import { EnrichedPurchaseRecord } from "~/server/api/routers/purchaserecords";
 
-export default async function Stats() {
-  const purchaseRecords = await helper.purchaseRecord.getFiltered.fetch();
-  const emissionRecords = await helper.emissionRecord.getAll.fetch();
-
+export default async function Stats({
+  emissionRecords,
+  purchaseRecords,
+}: {
+  emissionRecords: EnrichedEmissionRecord[];
+  purchaseRecords: EnrichedPurchaseRecord[];
+}) {
   const purchasedProducts = new Set(
-    purchaseRecords.map((record) => record.Product.id),
+    purchaseRecords.map((record) => record.productId),
   );
 
   const productsWithEmissions = new Set(

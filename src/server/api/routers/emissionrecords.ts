@@ -1,67 +1,52 @@
 import { z } from "zod";
-import { publicProcedure, createTRPCRouter } from "../../trpc";
+import { publicProcedure, protectedProcedure, createTRPCRouter } from "../../trpc";
 import type {
   EmissionRecord,
-  Organization,
-  Product,
-  User,
 } from "~/server/types";
 import { currentUser } from "@clerk/nextjs/server";
 import { Resend } from "resend";
 import { TRPCError } from "@trpc/server";
 
 export type EnrichedEmissionRecord = EmissionRecord & {
-  Product: Pick<Product, "name" | "id">;
-  Supplier: Pick<Organization, "name" | "country">;
-};
+  productId: string;
+  productName: string;
+  organizationName: string;
+}
 
 export const emissionRecordRouter = createTRPCRouter({
-  getWithToken: publicProcedure
-    .input(
-      z.object({
-        emissionRecordId: z.string(),
-        // token: z.string()
-      }),
-    )
+  getSingle: publicProcedure
+    .input(z.object({ emissionRecordId: z.string() }))
     .query(async ({ ctx, input }) => {
-      console.log("Received emissionRecordId:", input.emissionRecordId); // Debug log
-
-      const { data, error } = await ctx.supabase
+      const { data: emissionRecordData, error: emissionRecordError } = await ctx.supabase
         .from("EmissionRecord")
-        .select("*")
+        .select(`*, ...Product(productId, productName, ...Organization(organizationName))`)
         .eq("id", input.emissionRecordId)
         .single();
-      if (error) {
-        throw new Error(error.message);
+      if (emissionRecordError) {
+        throw new TRPCError({ message: emissionRecordError.message, code: "NOT_FOUND" });
       }
-      return data as EmissionRecord;
+      return emissionRecordData as EnrichedEmissionRecord;
     }),
 
-  getAll: publicProcedure.query(async ({ ctx }) => {
-    const clerkUser = await currentUser();
-    if (!clerkUser) {
-      throw new Error("No active Clerk session");
-    }
-
+  getFiltered: protectedProcedure.query(async ({ ctx }) => {
     const { data: supaUser, error: userError } = await ctx.supabase
       .from("User")
       .select("id, authId")
-      .eq("authId", clerkUser.id)
+      .eq("authId", ctx.user.id)
       .single();
     if (!supaUser || userError) {
       throw new Error("User not activated");
     }
-    console.log(supaUser);
 
     const { data: emissionRecords, error } = await ctx.supabase
       .from("EmissionRecord")
       .select(
         `
       *,
-      Product!inner (
-        name, id,
-        Organization!inner (
-          name,
+      ...Product!inner (
+        productName, productId,
+        ...Organization!inner (
+          organizationName,
           OrgRelation!inner!supplierOrgId (
             supplierOrgId,
             customerOrgId,
@@ -80,14 +65,11 @@ export const emissionRecordRouter = createTRPCRouter({
         supaUser.id,
       );
 
-    console.log(emissionRecords);
+    if (error) {
+      throw new TRPCError({ message: error.message, code: "NOT_FOUND" })
+    }
 
-    return emissionRecords?.map(record => ({
-      ...record,
-      productName: record.Product.name,
-      productId: record.Product.id,
-      organizationName: record.Product.Organization.name,
-    })) as EnrichedEmissionRecord[];
+    return emissionRecords as EnrichedEmissionRecord[];
   }),
 
   create: publicProcedure
@@ -128,11 +110,11 @@ export const emissionRecordRouter = createTRPCRouter({
           .from("Product")
           .select(
             `
-        id, name, Organization(email, name)
+        productId, productName, Organization(email, organizationName)
         `,
           )
-          .in("id", requestedProductIds);
-        console.log(emailError);
+          .in("productId", requestedProductIds);
+
         if (emailError) {
           throw new TRPCError({
             code: "INTERNAL_SERVER_ERROR",
@@ -144,10 +126,10 @@ export const emissionRecordRouter = createTRPCRouter({
         const testHTML = newEmissionRecords
           .map((record: EmissionRecord) => {
             const emailObj: {
-              id: string;
-              name: string;
-              Organization: { email: string };
-            } = emailData.find((email) => email.id === record.productId);
+              productId: string;
+              productName: string;
+              Organization: { email: string, organizationName: string };
+            } = emailData.find((email) => email.productId === record.productId);
             if (emailObj) {
               return `<p>Please submit your data at the following link: 
           <a href="https://seasydata.com/submit-data/${record.id}">Submit Data</a>

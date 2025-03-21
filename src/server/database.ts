@@ -37,36 +37,36 @@ export type Database = {
       EmissionRecord: {
         Row: {
           calculationMethod: string | null
-          CO2e: number
+          CO2e: number | null
           comment: string | null
           createdAt: string
-          id: string
+          emissionId: string
           productId: string
-          recordDate: string
+          recordDate: string | null
           source: string | null
           status: string
           updatedAt: string | null
         }
         Insert: {
           calculationMethod?: string | null
-          CO2e: number
+          CO2e?: number | null
           comment?: string | null
           createdAt?: string
-          id?: string
+          emissionId?: string
           productId: string
-          recordDate: string
+          recordDate?: string | null
           source?: string | null
           status: string
           updatedAt?: string | null
         }
         Update: {
           calculationMethod?: string | null
-          CO2e?: number
+          CO2e?: number | null
           comment?: string | null
           createdAt?: string
-          id?: string
+          emissionId?: string
           productId?: string
-          recordDate?: string
+          recordDate?: string | null
           source?: string | null
           status?: string
           updatedAt?: string | null
@@ -77,7 +77,7 @@ export type Database = {
             columns: ["productId"]
             isOneToOne: false
             referencedRelation: "Product"
-            referencedColumns: ["id"]
+            referencedColumns: ["productId"]
           },
         ]
       }
@@ -87,8 +87,8 @@ export type Database = {
           country: string | null
           createdAt: string
           email: string
-          id: string
-          name: string
+          organizationId: string
+          organizationName: string
           organizationNumber: number | null
           updatedAt: string
         }
@@ -97,8 +97,8 @@ export type Database = {
           country?: string | null
           createdAt?: string
           email: string
-          id?: string
-          name: string
+          organizationId?: string
+          organizationName: string
           organizationNumber?: number | null
           updatedAt: string
         }
@@ -107,8 +107,8 @@ export type Database = {
           country?: string | null
           createdAt?: string
           email?: string
-          id?: string
-          name?: string
+          organizationId?: string
+          organizationName?: string
           organizationNumber?: number | null
           updatedAt?: string
         }
@@ -148,14 +148,14 @@ export type Database = {
             columns: ["customerOrgId"]
             isOneToOne: false
             referencedRelation: "Organization"
-            referencedColumns: ["id"]
+            referencedColumns: ["organizationId"]
           },
           {
             foreignKeyName: "OrgRelation_supplierOrgId_fkey"
             columns: ["supplierOrgId"]
             isOneToOne: false
             referencedRelation: "Organization"
-            referencedColumns: ["id"]
+            referencedColumns: ["organizationId"]
           },
         ]
       }
@@ -164,9 +164,10 @@ export type Database = {
           comment: string | null
           createdAt: string
           description: string | null
-          id: string
-          name: string
           organizationId: string
+          productId: string
+          productName: string
+          purchaseDate: string | null
           unit: string
           updatedAt: string
         }
@@ -174,9 +175,10 @@ export type Database = {
           comment?: string | null
           createdAt?: string
           description?: string | null
-          id?: string
-          name: string
           organizationId: string
+          productId?: string
+          productName: string
+          purchaseDate?: string | null
           unit: string
           updatedAt: string
         }
@@ -184,9 +186,10 @@ export type Database = {
           comment?: string | null
           createdAt?: string
           description?: string | null
-          id?: string
-          name?: string
           organizationId?: string
+          productId?: string
+          productName?: string
+          purchaseDate?: string | null
           unit?: string
           updatedAt?: string
         }
@@ -196,7 +199,7 @@ export type Database = {
             columns: ["organizationId"]
             isOneToOne: false
             referencedRelation: "Organization"
-            referencedColumns: ["id"]
+            referencedColumns: ["organizationId"]
           },
         ]
       }
@@ -205,9 +208,9 @@ export type Database = {
           comment: string | null
           createdAt: string
           customerOrgId: string
-          id: string
           productId: string
           purchaseDate: string
+          purchaseId: string
           quantity: number
           supplierOrgId: string
           updatedAt: string | null
@@ -216,9 +219,9 @@ export type Database = {
           comment?: string | null
           createdAt?: string
           customerOrgId: string
-          id?: string
           productId: string
           purchaseDate: string
+          purchaseId?: string
           quantity: number
           supplierOrgId: string
           updatedAt?: string | null
@@ -227,9 +230,9 @@ export type Database = {
           comment?: string | null
           createdAt?: string
           customerOrgId?: string
-          id?: string
           productId?: string
           purchaseDate?: string
+          purchaseId?: string
           quantity?: number
           supplierOrgId?: string
           updatedAt?: string | null
@@ -240,21 +243,21 @@ export type Database = {
             columns: ["customerOrgId"]
             isOneToOne: false
             referencedRelation: "Organization"
-            referencedColumns: ["id"]
+            referencedColumns: ["organizationId"]
           },
           {
             foreignKeyName: "PurchaseRecord_productId_fkey"
             columns: ["productId"]
             isOneToOne: false
             referencedRelation: "Product"
-            referencedColumns: ["id"]
+            referencedColumns: ["productId"]
           },
           {
             foreignKeyName: "PurchaseRecord_supplierOrgId_fkey"
             columns: ["supplierOrgId"]
             isOneToOne: false
             referencedRelation: "Organization"
-            referencedColumns: ["id"]
+            referencedColumns: ["organizationId"]
           },
         ]
       }
@@ -264,6 +267,7 @@ export type Database = {
           createdAt: string
           email: string
           id: string
+          organizations: string[] | null
           updatedAt: string | null
         }
         Insert: {
@@ -271,6 +275,7 @@ export type Database = {
           createdAt?: string
           email: string
           id?: string
+          organizations?: string[] | null
           updatedAt?: string | null
         }
         Update: {
@@ -278,6 +283,7 @@ export type Database = {
           createdAt?: string
           email?: string
           id?: string
+          organizations?: string[] | null
           updatedAt?: string | null
         }
         Relationships: []
@@ -313,7 +319,7 @@ export type Database = {
             columns: ["organizationId"]
             isOneToOne: false
             referencedRelation: "Organization"
-            referencedColumns: ["id"]
+            referencedColumns: ["organizationId"]
           },
           {
             foreignKeyName: "UserOrganization_userId_fkey"

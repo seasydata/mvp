@@ -2,9 +2,7 @@
 
 import {
     Dialog,
-    DialogClose,
     DialogContent,
-    DialogDescription,
     DialogFooter,
     DialogHeader,
     DialogTitle,
@@ -15,10 +13,10 @@ import { Button } from "../ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useState } from "react";
 import { trpc } from "~/server/api/trpc/client";
-import type { EnrichedOrganization } from "~/server/api/routers/organization";
+import type { EnrichedOrganization } from "~/server/api/routers/organizations";
 import type { EnrichedProduct } from "~/server/api/routers/products";
 
-import type { Product, Pu } from "~/server/types";
+import type { Product } from "~/server/types";
 import type { ColumnDef } from "@tanstack/react-table";
 import { useEffect } from "react";
 
@@ -29,6 +27,7 @@ export default function PurchaseRecordDialog({
     organizations: EnrichedOrganization[];
     products: EnrichedProduct[];
 }) {
+    console.log(products);
     const createPurchaseRecord = trpc.purchaseRecord.create.useMutation();
 
     const [selectedOrganizations, setSelectedOrganizations] = useState<string[]>(
@@ -60,7 +59,6 @@ export default function PurchaseRecordDialog({
     };
 
     const handleProductCheckboxChange = (productId: string) => {
-        console.log("checking");
         setSelectedProducts((prevSelected) =>
             prevSelected.includes(productId)
                 ? prevSelected.filter((id) => id !== productId)
@@ -68,22 +66,22 @@ export default function PurchaseRecordDialog({
         );
     };
 
+    // Only supports creating for one customer org.
+    // i.e. if user is part of multiple organizations,
+    // the purchaserecord might be created for the wrong one
     const handleCreatePurchaseRecords = async () => {
         const purchasedProducts = products
-            .filter((product) => selectedProducts.includes(product.id))
+            .filter((product) => selectedProducts.includes(product.productId))
             .map((product) => ({
-                supplierOrgId: product.Supplier.id,
-                customerOrgId: product.Supplier.OrgRelation[0].Customer.id,
-                productId: product.id,
+                supplierOrgId: product.organizationId,
+                productId: product.productId,
                 quantity: 0,
                 purchaseDate: new Date().toISOString(),
                 comment: "",
-            }))
+            }));
 
         try {
-            await createPurchaseRecord.mutateAsync(
-                purchasedProducts,
-            );
+            await createPurchaseRecord.mutateAsync(purchasedProducts);
             alert("Purchase records created successfully!");
         } catch (error) {
             console.error("Error creating purchase records:", error);
@@ -92,15 +90,20 @@ export default function PurchaseRecordDialog({
     };
 
     const columns: ColumnDef<Product>[] = [
-        { accessorKey: "name", header: "Product" },
-        { accessorKey: "supplierName", header: "Organization" },
+        { accessorKey: "productName", header: "Product" },
+        { accessorKey: "description", header: "Description" },
+        { accessorKey: "unit", header: "Unit" },
+        { accessorKey: "organizationName", header: "Organization" },
+        { accessorKey: "purchaseDate", header: "Purchased on" },
         {
             accessorKey: "select",
             header: "Select",
             cell: ({ row }) => (
                 <Checkbox
-                    checked={selectedProducts.includes(row.original.id)}
-                    onCheckedChange={() => handleProductCheckboxChange(row.original.id)}
+                    checked={selectedProducts.includes(row.original.productId)}
+                    onCheckedChange={() =>
+                        handleProductCheckboxChange(row.original.productId)
+                    }
                 />
             ),
         },
@@ -113,24 +116,27 @@ export default function PurchaseRecordDialog({
                     Add purchase record
                 </Button>
             </DialogTrigger>
-            <DialogContent className="min-w-[1000px] h-[800]  text-cyan-900 font-sans flex flex-col">
+            <DialogContent className="max-w-fit min-w-[1000px] h-[1000] text-cyan-900 font-sans flex flex-col">
                 <DialogHeader className="flex-none">
                     <DialogTitle className="text-5xl">
                         Add new purchase record
                     </DialogTitle>
                 </DialogHeader>
-                <div className="flex flex-row flex-grow gap-10 overflow-hidden">
-                    <div className="flex flex-col flex-grow gap-2 mt-2 max-h-full">
+                <div className="flex flex-row flex-grow gap-10 w-max ">
+                    <div className="flex flex-col flex-grow gap-2 mt-2 max-h-full w-max">
                         {organizations?.map((org: EnrichedOrganization) => (
-                            <label key={org.id} className="flex items-center space-x-2">
+                            <label
+                                key={org.organizationId}
+                                className="flex items-center space-x-2"
+                            >
                                 <input
                                     type="checkbox"
-                                    checked={selectedOrganizations.includes(org.supplierOrgId)}
+                                    checked={selectedOrganizations.includes(org.organizationId)}
                                     onChange={() =>
-                                        handleOrganizationCheckboxChange(org.supplierOrgId)
+                                        handleOrganizationCheckboxChange(org.organizationId)
                                     }
                                 />
-                                <span className="text-2xl">{org.Organization.name}</span>
+                                <span className="text-2xl">{org.organizationName}</span>
                             </label>
                         ))}
                     </div>

@@ -1,21 +1,22 @@
-"use server";
-import Stats from "./stats";
+"use client";
+
 import type { ColumnDef } from "@tanstack/react-table";
 import { DataTable } from "~/components/dashboard/data-table";
-import type { EnrichedPurchaseRecord } from "~/server/api/routers/purchaserecords";
-import type { EmissionRecord } from "~/server/types";
-import { helper } from "~/app/_trpc/helper";
 import EmissionRecordDialog from "~/components/dashboard/EmissionRecordDialog";
 import { type EnrichedEmissionRecord } from "~/server/api/routers/emissionrecords";
-
+import { type EnrichedPurchaseRecord } from "~/server/api/routers/purchaserecords";
 const columns: ColumnDef<EnrichedEmissionRecord>[] = [
   {
-    accessorKey: "productId",
-    header: "Product",
+    accessorKey: "productName",
+    header: "Product"
   },
   {
     accessorKey: "recordDate",
     header: "Date recorded",
+  },
+  {
+    accessorKey: "status",
+    header: "Status",
   },
   {
     accessorKey: "CO2e",
@@ -29,34 +30,27 @@ const columns: ColumnDef<EnrichedEmissionRecord>[] = [
     accessorKey: "comment",
     header: "Comment",
   },
-  // {
-  //     accessorKey: "productName",
-  //     header: "Product"
-  // }
+  {
+    accessorKey: "organizationName",
+    header: "Supplier",
+  },
+
 ];
 
-export default async function EmissionRecords() {
-  const emissionRecords: EmissionRecord[] =
-    await helper.emissionRecord.getAll.fetch();
+export default function EmissionRecords(
+  { emissionRecords, purchaseRecords }: {
+    emissionRecords: EnrichedEmissionRecord[],
+    purchaseRecords: EnrichedPurchaseRecord[]
+  }) {
 
-  const purchaseRecords: EnrichedPurchaseRecord[] =
-    await helper.purchaseRecord.getFiltered.fetch();
-  const transformedRecords = purchaseRecords.map((purchaseRecord) => ({
-    ...purchaseRecord,
-    productName: purchaseRecord.Product.name,
-    productDescription: purchaseRecord.Product.description,
-    supplierName: purchaseRecord.Organization.name,
-    supplierCountry: purchaseRecord.Organization.country,
-    purchaseDate: purchaseRecord.purchaseDate.slice(0, 10),
-  }));
   return (
     <>
       <div className="flex flex-row items-center space-x-10  pt-10">
         <div className="font-bold">EMISSION RECORDS</div>
         <div>
-          <EmissionRecordDialog purchaseRecords={transformedRecords} />
+          <EmissionRecordDialog purchaseRecords={purchaseRecords} />
         </div>
-        <Stats />
+
       </div>
 
       <div className="pt-10 flex flex-col gap-10">

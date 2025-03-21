@@ -5,42 +5,68 @@ import {
   protectedProcedure,
 } from "../../trpc";
 import type { PurchaseRecord, Organization, Product } from "~/server/types";
+import { TRPCError } from "@trpc/server";
 
 export type EnrichedPurchaseRecord = PurchaseRecord & {
-  Organization: Pick<Organization, "name" | "country">; // Only pick 'id' and 'name' from Organization
-  Product: Pick<Product, "id" | "name" | "description">; // Only pick 'id' and 'name' from Product
+  organizationName: string;
+  organizationCountry: string;
+  productId: string;
+  productName: string;
+  description: string;
 };
 
 export const purchaseRecordRouter = createTRPCRouter({
-  getAll: publicProcedure.query(async ({ ctx }) => {
-    const { data, error } = await ctx.supabase.from("PurchaseRecord").select();
-    if (error) {
-      throw new Error(error.message);
-    }
-    return data as PurchaseRecord[];
-  }),
 
-  getFiltered: publicProcedure.query(async ({ ctx }) => {
-    const { data, error } = await ctx.supabase.from("PurchaseRecord").select(`
-        *,
-        Product(id, name, description),
-        Organization!supplierOrgId(name, country)
-    `);
-    // .eq('customerOrgId', ctx.orgId); // Filter on customerOrgId
-    if (error) {
-      throw new Error(error.message);
+  getFiltered: protectedProcedure.query(async ({ ctx }) => {
+    const { data: supaUser, error: userError } = await ctx.supabase
+      .from("User")
+      .select("id, authId, UserOrganization!userId(organizationId)")
+      .eq("authId", ctx.user.id)
+      .single();
+    if (!supaUser || userError) {
+      throw new Error(userError.message);
     }
-    return data as EnrichedPurchaseRecord[];
+
+    const { data: purchaseRecords, error: purchaseRecordsError } = await ctx.supabase
+      .from("PurchaseRecord")
+      .select(
+        `
+      *,
+      ...Product!inner (
+         productId, productName, description,
+        ...Organization!inner (
+          organizationName,
+          OrgRelation!inner!supplierOrgId (
+            supplierOrgId,
+            customerOrgId,
+            Organization!inner!customerOrgId (
+              UserOrganization!inner (
+                userId
+              )
+            )
+          )
+        )
+      )
+    `,
+      )
+      .eq(
+        "Product.Organization.OrgRelation.Organization.UserOrganization.userId",
+        supaUser.id,
+      );
+    if (purchaseRecordsError) {
+      throw new Error(purchaseRecordsError.message);
+    }
+
+    return purchaseRecords as EnrichedPurchaseRecord[];
   }),
 
   // TODO: Needs further validation so that only purchaserecords with valid
   // product/supplier ids can be created
-  create: publicProcedure
+  create: protectedProcedure
     .input(
       z
         .object({
           supplierOrgId: z.string(),
-          customerOrgId: z.string(),
           productId: z.string(),
           quantity: z.number(),
           purchaseDate: z.string(),
@@ -49,12 +75,26 @@ export const purchaseRecordRouter = createTRPCRouter({
         .array(),
     )
     .mutation(async ({ ctx, input }) => {
-      const { data, error } = await ctx.supabase
-        .from("PurchaseRecord")
-        .insert(input);
-      if (error) {
-        throw new Error(error.message);
+
+      const { data: orgData, error: orgError } = await ctx.supabase
+        .from("Organization")
+        .select("organizationId, UserOrganization!inner!organizationId(userId, User!inner!userId(authId))")
+        .eq("UserOrganization.User.authId", ctx.auth.userId)
+        .single()
+      if (orgError) {
+        throw new TRPCError({ message: orgError.message, code: 'INTERNAL_SERVER_ERROR' })
       }
-      return data;
+
+      console.log(orgData)
+      const completeInput = input.map((record) => ({ ...record, customerOrgId: orgData.organizationId }))
+      console.log(completeInput)
+
+      // const { data, error } = await ctx.supabase
+      //   .from("PurchaseRecord")
+      //   .insert(input);
+      // if (error) {
+      //   throw new Error(error.message);
+      // }
+      // return data;
     }),
 });

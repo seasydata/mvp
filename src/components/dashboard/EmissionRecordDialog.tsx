@@ -2,9 +2,7 @@
 
 import {
   Dialog,
-  DialogClose,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -14,12 +12,11 @@ import { DataTable } from "./data-table";
 import { Button } from "../ui/button";
 import { useState } from "react";
 import { trpc } from "~/server/api/trpc/client";
-import type { EnrichedOrganization } from "~/server/api/routers/organizations";
-import type { EnrichedProduct } from "~/server/api/routers/products";
+
 import type { EnrichedPurchaseRecord } from "~/server/api/routers/purchaserecords";
-import type { EmissionRecord, Product } from "~/server/types";
+import type { CreateEmissionRecord } from "~/server/types";
 import type { ColumnDef } from "@tanstack/react-table";
-import { useEffect } from "react";
+import { Checkbox } from "../ui/checkbox";
 
 export default function EmissionRecordDialog({
   purchaseRecords,
@@ -38,9 +35,6 @@ export default function EmissionRecordDialog({
     );
   };
 
-  const handleRunFunction = () => {
-    console.log("Selected Records:", selectedRecords);
-  };
 
   const columns: ColumnDef<EnrichedPurchaseRecord>[] = [
     { accessorKey: "productName", header: "Product" },
@@ -50,10 +44,9 @@ export default function EmissionRecordDialog({
       accessorKey: "select",
       header: "Select",
       cell: ({ row }) => (
-        <input
-          type="checkbox"
-          checked={row.original.selected}
-          onChange={() => handleCheckboxChange(row.original.id)}
+        <Checkbox
+          checked={selectedRecords.includes(row.original.productId)}
+          onCheckedChange={() => handleCheckboxChange(row.original.productId)}
         />
       ),
     },
@@ -61,12 +54,12 @@ export default function EmissionRecordDialog({
 
   const handleCreateEmissionRecords = async () => {
     // console.log(purchaseRecords)
-    const newEmissionRecords: EmissionRecord = purchaseRecords
-      .filter((record) => selectedRecords.includes(record.id))
+    const newEmissionRecords: CreateEmissionRecord[] = purchaseRecords
+      .filter((record) => selectedRecords.includes(record.productId))
       .map((record) => ({
         productId: record.productId,
         status: "requested",
-        recordDate: new Date(), //.toISOString(),
+        recordDate: new Date().toISOString(),
         source: "internjet",
         CO2e: 1,
         calculationMethod: "AR4",
@@ -101,7 +94,7 @@ export default function EmissionRecordDialog({
               columns={columns}
               data={purchaseRecords.map((record) => ({
                 ...record,
-                selected: selectedRecords.includes(record.id),
+                selected: selectedRecords.includes(record.productId),
               }))}
             />
           </div>
