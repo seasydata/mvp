@@ -1,6 +1,4 @@
 import React from "react";
-import Navbar from "../../components/header/navbar";
-import Footer from "../../components/footer";
 import WelcomeHeader from "~/components/styles/welcome-header";
 import Content1 from "~/components/about/content1";
 import Content2 from "~/components/about/content2";

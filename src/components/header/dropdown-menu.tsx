@@ -40,9 +40,9 @@ const DropdownMenu: React.FC<DropdownMenuProps> = ({
 
   return (
     <Box>
-      <Tooltip title={title || "Open menu"}>
+      <Tooltip title={title ?? "Open menu"}>
         <IconButton onClick={handleOpenMenu}>
-          {icon || <FaBars size={24} />}
+          {icon ?? <FaBars size={24} />}
         </IconButton>
       </Tooltip>
 
