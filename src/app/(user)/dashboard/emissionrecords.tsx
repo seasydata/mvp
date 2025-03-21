@@ -34,7 +34,6 @@ const columns: ColumnDef<EnrichedEmissionRecord>[] = [
     accessorKey: "organizationName",
     header: "Supplier",
   },
-
 ];
 
 export default function EmissionRecords(

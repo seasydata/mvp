@@ -13,10 +13,9 @@ import { Button } from "../ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useState } from "react";
 import { trpc } from "~/server/api/trpc/client";
-import type { EnrichedOrganization } from "~/server/api/routers/organizations";
 import type { EnrichedProduct } from "~/server/api/routers/products";
 
-import type { Product } from "~/server/types";
+import type { Organization, Product } from "~/server/types";
 import type { ColumnDef } from "@tanstack/react-table";
 import { useEffect } from "react";
 
@@ -24,10 +23,10 @@ export default function PurchaseRecordDialog({
     organizations,
     products,
 }: {
-    organizations: EnrichedOrganization[];
+    organizations: Organization[];
     products: EnrichedProduct[];
 }) {
-    console.log(products);
+
     const createPurchaseRecord = trpc.purchaseRecord.create.useMutation();
 
     const [selectedOrganizations, setSelectedOrganizations] = useState<string[]>(
@@ -124,7 +123,7 @@ export default function PurchaseRecordDialog({
                 </DialogHeader>
                 <div className="flex flex-row flex-grow gap-10 w-max ">
                     <div className="flex flex-col flex-grow gap-2 mt-2 max-h-full w-max">
-                        {organizations?.map((org: EnrichedOrganization) => (
+                        {organizations?.map((org: Organization) => (
                             <label
                                 key={org.organizationId}
                                 className="flex items-center space-x-2"
@@ -140,7 +139,7 @@ export default function PurchaseRecordDialog({
                             </label>
                         ))}
                     </div>
-                    <div className="overflow-y-scroll scrollbar-hidden overflow-x-hidden flex flex-col flex-grow gap-2 mt-2 table-fixed max-h-[calc(100vh-300px)]">
+                    <div className="overflow-y-scroll  overflow-x-hidden flex flex-col flex-grow gap-2 mt-2 table-fixed max-h-[calc(100vh-300px)]">
                         <div className="h-full">
                             <DataTable columns={columns} data={filteredProducts} />
                         </div>
@@ -159,3 +158,5 @@ export default function PurchaseRecordDialog({
         </Dialog>
     );
 }
+
+// scrollbar-hidden

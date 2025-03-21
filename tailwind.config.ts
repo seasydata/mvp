@@ -32,16 +32,4 @@ export default {
       },
     },
   },
-  plugins: [require("tailwindcss-animate"),
-    function({ addComponents }: { addComponents: (components: Record<string, any>) => void }) {
-      addComponents({
-        '.scrollbar-hidden': {
-          '::-webkit-scrollbar': {
-            display: 'none',
-          },
-          'scrollbar-width': 'none', // Firefox
-        },
-      })
-    }
-  ],
 } satisfies Config;

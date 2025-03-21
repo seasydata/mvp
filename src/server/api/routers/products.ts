@@ -33,15 +33,18 @@ export const productRouter = createTRPCRouter({
           ),
           OrgRelation!inner!customerOrgId(supplierOrgId)`,
         )
-        .eq("UserOrganization.User.authId", clerkUser.id);
+        .eq("UserOrganization.User.authId", clerkUser.id)
+        .returns<{ organizationId: string; OrgRelation: { supplierOrgId: string }[] }[]>();
     if (!organizations || organizationsError) {
       throw new Error(organizationsError.message);
     }
+    // eslint-disable-next-line no-use-before-define
     const orgIds = organizations.map((organization) =>
-      organization.OrgRelation.map((relation) => relation.supplierOrgId),
+      organization.OrgRelation.map((relation: { supplierOrgId: string }) => relation.supplierOrgId)// eslint-disable-line
+
     );
     const flatIds = orgIds.flat();
-    console.log(flatIds);
+
     const { data: products, error: queryError } = await ctx.supabase
       .from("Product")
       .select(

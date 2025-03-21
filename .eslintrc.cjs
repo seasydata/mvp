@@ -36,5 +36,6 @@ const config = {
       },
     ],
   },
+  ignorePatterns: ["src/components/ui/"], // Add this line to ignore the directory
 };
 module.exports = config;

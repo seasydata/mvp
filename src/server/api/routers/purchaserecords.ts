@@ -1,15 +1,14 @@
 import { z } from "zod";
 import {
-  publicProcedure,
   createTRPCRouter,
   protectedProcedure,
 } from "../../trpc";
-import type { PurchaseRecord, Organization, Product } from "~/server/types";
+import type { PurchaseRecord } from "~/server/types";
 import { TRPCError } from "@trpc/server";
 
 export type EnrichedPurchaseRecord = PurchaseRecord & {
   organizationName: string;
-  organizationCountry: string;
+  organizationId: string;
   productId: string;
   productName: string;
   description: string;
@@ -18,41 +17,47 @@ export type EnrichedPurchaseRecord = PurchaseRecord & {
 export const purchaseRecordRouter = createTRPCRouter({
 
   getFiltered: protectedProcedure.query(async ({ ctx }) => {
-    const { data: supaUser, error: userError } = await ctx.supabase
-      .from("User")
-      .select("id, authId, UserOrganization!userId(organizationId)")
-      .eq("authId", ctx.user.id)
-      .single();
-    if (!supaUser || userError) {
-      throw new Error(userError.message);
+    // const { data: supaUser, error: userError } = await ctx.supabase
+    //   .from("User")
+    //   .select("id, authId, UserOrganization!userId(organizationId)")
+    //   .eq("authId", ctx.auth.userId)
+    //   .single();
+    // if (!supaUser || userError) {
+    //   throw new Error(userError.message);
+    // }
+
+    const { data: organizations, error: organizationsError } =
+      await ctx.supabase
+        .from("Organization")
+        .select(
+          `
+          organizationId, 
+          UserOrganization!inner(
+            User!inner(authId)
+          ),
+          OrgRelation!inner!customerOrgId(supplierOrgId)`,
+        )
+        .eq("UserOrganization.User.authId", ctx.auth.userId)
+        .returns<{ organizationId: string; OrgRelation: { supplierOrgId: string }[] }[]>();
+    if (!organizations || organizationsError) {
+      throw new Error(organizationsError.message);
     }
+    // eslint-disable-next-line no-use-before-define
+    const orgIds = organizations.map((organization) =>
+      organization.OrgRelation.map((relation: { supplierOrgId: string }) => relation.supplierOrgId)// eslint-disable-line
+
+    );
+    const flatIds = orgIds.flat();
 
     const { data: purchaseRecords, error: purchaseRecordsError } = await ctx.supabase
       .from("PurchaseRecord")
-      .select(
-        `
+      .select(`
       *,
-      ...Product!inner (
-         productId, productName, description,
-        ...Organization!inner (
-          organizationName,
-          OrgRelation!inner!supplierOrgId (
-            supplierOrgId,
-            customerOrgId,
-            Organization!inner!customerOrgId (
-              UserOrganization!inner (
-                userId
-              )
-            )
-          )
-        )
-      )
-    `,
-      )
-      .eq(
-        "Product.Organization.OrgRelation.Organization.UserOrganization.userId",
-        supaUser.id,
-      );
+      ...Product!inner(productId, productName, description,
+        ...Organization!inner(organizationId, organizationName)
+        )`)
+      .in("Product.Organization.organizationId", flatIds)
+      .returns();
     if (purchaseRecordsError) {
       throw new Error(purchaseRecordsError.message);
     }
@@ -80,14 +85,13 @@ export const purchaseRecordRouter = createTRPCRouter({
         .from("Organization")
         .select("organizationId, UserOrganization!inner!organizationId(userId, User!inner!userId(authId))")
         .eq("UserOrganization.User.authId", ctx.auth.userId)
-        .single()
+        .single<{ organizationId: string; UserOrganization: { userId: string, User: { authId: string } } }>()
       if (orgError) {
         throw new TRPCError({ message: orgError.message, code: 'INTERNAL_SERVER_ERROR' })
       }
 
-      console.log(orgData)
-      const completeInput = input.map((record) => ({ ...record, customerOrgId: orgData.organizationId }))
-      console.log(completeInput)
+      const completeInput = input.map((record) => ({ ...record, customerOrgId: orgData.organizationId })) // eslint-disable-line
+
 
       // const { data, error } = await ctx.supabase
       //   .from("PurchaseRecord")

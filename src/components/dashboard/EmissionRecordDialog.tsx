@@ -14,7 +14,6 @@ import { useState } from "react";
 import { trpc } from "~/server/api/trpc/client";
 
 import type { EnrichedPurchaseRecord } from "~/server/api/routers/purchaserecords";
-import type { CreateEmissionRecord } from "~/server/types";
 import type { ColumnDef } from "@tanstack/react-table";
 import { Checkbox } from "../ui/checkbox";
 
@@ -26,6 +25,7 @@ export default function EmissionRecordDialog({
   const createEmissionRecord = trpc.emissionRecord.create.useMutation();
 
   const [selectedRecords, setSelectedRecords] = useState<string[]>([]);
+  const [source, setSource] = useState<string>("")
 
   const handleCheckboxChange = (recordId: string) => {
     setSelectedRecords((prevSelected) =>
@@ -34,7 +34,6 @@ export default function EmissionRecordDialog({
         : [...prevSelected, recordId],
     );
   };
-
 
   const columns: ColumnDef<EnrichedPurchaseRecord>[] = [
     { accessorKey: "productName", header: "Product" },
@@ -54,13 +53,13 @@ export default function EmissionRecordDialog({
 
   const handleCreateEmissionRecords = async () => {
     // console.log(purchaseRecords)
-    const newEmissionRecords: CreateEmissionRecord[] = purchaseRecords
+    const newEmissionRecords = purchaseRecords
       .filter((record) => selectedRecords.includes(record.productId))
       .map((record) => ({
         productId: record.productId,
-        status: "requested",
+        status: "requested" as const,
         recordDate: new Date().toISOString(),
-        source: "internjet",
+        source: source,
         CO2e: 1,
         calculationMethod: "AR4",
         comment: "a comment",
@@ -68,7 +67,7 @@ export default function EmissionRecordDialog({
 
     try {
       const returnEmails =
-        await createEmissionRecord.mutateAsync(newEmissionRecords);
+        await createEmissionRecord.mutateAsync(newEmissionRecords); //eslint-ignore
       console.log(returnEmails);
       alert("Emission records created successfully");
     } catch (error) {
@@ -111,3 +110,9 @@ export default function EmissionRecordDialog({
     </Dialog>
   );
 }
+
+export const statusEnum = {
+  draft: "draft",
+  requested: "requested",
+  fulfilled: "fulfilled",
+} as const;

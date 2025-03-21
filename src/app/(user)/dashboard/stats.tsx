@@ -1,6 +1,5 @@
-import { helper } from "~/app/_trpc/helper";
-import { EnrichedEmissionRecord } from "~/server/api/routers/emissionrecords";
-import { EnrichedPurchaseRecord } from "~/server/api/routers/purchaserecords";
+import { type EnrichedEmissionRecord } from "~/server/api/routers/emissionrecords";
+import { type EnrichedPurchaseRecord } from "~/server/api/routers/purchaserecords";
 
 export default async function Stats({
   emissionRecords,

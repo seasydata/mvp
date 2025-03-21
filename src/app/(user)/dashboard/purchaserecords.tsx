@@ -2,9 +2,8 @@ import { DataTable } from "~/components/dashboard/data-table";
 import type { ColumnDef } from "@tanstack/react-table";
 import type { EnrichedPurchaseRecord } from "~/server/api/routers/purchaserecords";
 import PurchaseRecordDialog from "~/components/dashboard/PurchaseRecordDialog";
-import { helper } from "~/app/_trpc/helper";
-import type { EnrichedOrganization } from "~/server/api/routers/organizations";
 import type { EnrichedProduct } from "~/server/api/routers/products";
+import { type Organization } from "~/server/types";
 
 const columns: ColumnDef<EnrichedPurchaseRecord>[] = [
   {
@@ -31,12 +30,14 @@ const columns: ColumnDef<EnrichedPurchaseRecord>[] = [
 
 export default async function PurchaseRecords({
   purchaseRecords,
+  organizations,
+  products
 }: {
   purchaseRecords: EnrichedPurchaseRecord[];
+  organizations: Organization[];
+  products: EnrichedProduct[];
 }) {
-  const organizations: EnrichedOrganization[] =
-    await helper.organization.getFiltered.fetch();
-  const products: EnrichedProduct[] = await helper.product.getFiltered.fetch();
+
 
   return (
     <>

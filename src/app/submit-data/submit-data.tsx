@@ -1,7 +1,6 @@
 'use client'
 
 import {
-    useFormField,
     Form,
     FormItem,
     FormLabel,
@@ -45,11 +44,11 @@ export default function SubmitData({ emissionRecord
 }: { emissionRecord: EnrichedEmissionRecord }) {
 
     const formSchema = z.object({
-        productId: z.string(emissionRecord.productId),
-        recordDate: z.string().datetime({ precision: 0 }),
+        productId: z.string(),
+        recordDate: z.date(),
         source: z.string(),
-        calculationMethod: z.enum(["AR4", "AR5", "AR6"]).optional(),
-        comment: z.string().optional(),
+        calculationMethod: z.enum(["AR4", "AR5", "AR6"]),
+        comment: z.string(),
         CO2e: z.number().positive("CO2e must be a positive number")
 
     })
@@ -59,7 +58,7 @@ export default function SubmitData({ emissionRecord
         resolver: zodResolver(formSchema),
         defaultValues: {
             productId: emissionRecord.productId,
-            recordDate: new Date().toISOString(),
+            recordDate: new Date(),
             source: "",
             calculationMethod: undefined,
             comment: "",
@@ -68,7 +67,7 @@ export default function SubmitData({ emissionRecord
     })
 
     function onSubmit(values: z.infer<typeof formSchema>) {
-
+        /// convert date to string
         console.log(values)
     }
 
@@ -101,7 +100,7 @@ export default function SubmitData({ emissionRecord
                         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                             <FormField
                                 control={form.control}
-                                name="dob"
+                                name="recordDate"
                                 render={({ field }) => (
                                     <FormItem className="flex flex-col">
                                         <FormLabel>Date of emission record</FormLabel>

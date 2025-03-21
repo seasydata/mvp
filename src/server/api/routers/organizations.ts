@@ -1,13 +1,11 @@
 import { currentUser } from "@clerk/nextjs/server";
-import { publicProcedure, createTRPCRouter, protectedProcedure } from "../../trpc";
-import type { Organization, OrgRelation, User } from "~/server/types";
-
-export type EnrichedOrganization = Organization
+import { createTRPCRouter, protectedProcedure } from "../../trpc";
+import type { Organization, User } from "~/server/types";
 
 
 export const organizationRouter = createTRPCRouter({
 
-  getAll: publicProcedure.query(async ({ ctx }) => {
+  getAll: protectedProcedure.query(async ({ ctx }) => {
     const { data, error } = await ctx.supabase
       .from("Organization").select();
     if (error) {
@@ -16,7 +14,7 @@ export const organizationRouter = createTRPCRouter({
     return data as Organization[];
   }),
 
-  getFiltered: publicProcedure.query(async ({ ctx }) => {
+  getSuppliers: protectedProcedure.query(async ({ ctx }) => {
     const clerkUser = await currentUser();
     if (!clerkUser) {
       throw new Error("No active Clerk session");
@@ -38,10 +36,10 @@ export const organizationRouter = createTRPCRouter({
       ...Organization!inner!supplierOrgId(*),
       customer:Organization!inner!customerOrgId(UserOrganization!inner(userId))
     `)
-      .eq('customer.UserOrganization.userId', supaUser.id);
+      .eq('customer.UserOrganization.userId', supaUser.id).returns<Organization[]>();
     if (error) {
       throw new Error(error.message);
     }
-    return data as EnrichedOrganization[];
+    return data;
   })
 });
