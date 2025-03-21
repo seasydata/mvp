@@ -19,7 +19,7 @@ export default function Header() {
             <div className='flex justify-between items-center w-4/5'>
                 <div className='flex mr-auto'>
                     <Link href={"/"}>
-                        <Image width='96' height='32' src="/images/logo.png" alt="Seasy Data Logo" />
+                        <Image width='96' height='32' src="/images/images/logo.png" alt="Seasy Data Logo" />
                     </Link>
                 </div>
                 <SignedIn>

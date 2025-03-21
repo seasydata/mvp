@@ -19,6 +19,12 @@ const geistMono = Geist_Mono({
 })
 
 
+import SuperJSON from "superjson";
+import "~/styles/globals.css";
+import Navbar from "~/components/header/navbar";
+import DevBanner from "~/components/header/dev-banner";
+import Footer from "~/components/footer";
+
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
@@ -37,8 +43,10 @@ export default function RootLayout({
       <trpc.Provider client={trpcClient} queryClient={queryClient}>
         <QueryClientProvider client={queryClient}>
           <html lang="en">
-            <body className={`${geistSans.variable} ${geistMono.variable} antialiased font-sans`}>
-              <main style={{ height: 'calc(100vh - 6rem)' }}>
+            <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+              <Navbar />
+              <DevBanner />
+              <main className="w-4/5 mx-auto">
                 {children}
               </main>
             </body>
