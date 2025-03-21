@@ -2,6 +2,7 @@
 
 import {
   SignInButton,
+  SignOutButton,
   SignedIn,
   SignedOut,
   UserButton,
@@ -84,6 +85,18 @@ const Navbar: React.FC = () => {
           </SignedOut>
           <SignedIn>
             Hello
+            <CustomButton variant="outlined" className="md-and-down:hidden" onClick={() => router.push("/dashboard")}>
+              Dashboard
+            </CustomButton>
+            <SignOutButton>
+
+              <CustomButton
+                variant="outlined"
+                className="md-and-down:hidden uppercase"
+                >
+                Sign out
+              </CustomButton>
+            </SignOutButton>
             <UserButton />
           </SignedIn>
           

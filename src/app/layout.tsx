@@ -18,12 +18,7 @@ const geistMono = Geist_Mono({
   subsets: ['latin'],
 })
 
-
-import SuperJSON from "superjson";
 import "~/styles/globals.css";
-import Navbar from "~/components/header/navbar";
-import DevBanner from "~/components/header/dev-banner";
-import Footer from "~/components/footer";
 
 export default function RootLayout({
   children,
@@ -44,9 +39,7 @@ export default function RootLayout({
         <QueryClientProvider client={queryClient}>
           <html lang="en">
             <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-              <Navbar />
-              <DevBanner />
-              <main className="w-4/5 mx-auto">
+              <main className="mx-auto">
                 {children}
               </main>
             </body>
