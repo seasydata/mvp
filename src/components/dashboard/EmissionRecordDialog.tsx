@@ -8,7 +8,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { DataTable } from "./data-table";
+import { DataTable } from "../ui/data-table";
 import { Button } from "../ui/button";
 import { useState } from "react";
 import { trpc } from "~/server/api/trpc/client";
@@ -16,6 +16,7 @@ import { trpc } from "~/server/api/trpc/client";
 import type { EnrichedPurchaseRecord } from "~/server/api/routers/purchaserecords";
 import type { ColumnDef } from "@tanstack/react-table";
 import { Checkbox } from "../ui/checkbox";
+import { toast } from "sonner";
 
 export default function EmissionRecordDialog({
   purchaseRecords,
@@ -25,7 +26,7 @@ export default function EmissionRecordDialog({
   const createEmissionRecord = trpc.emissionRecord.create.useMutation();
 
   const [selectedRecords, setSelectedRecords] = useState<string[]>([]);
-  const [source, setSource] = useState<string>("")
+  const [source, setSource] = useState<string>("");
 
   const handleCheckboxChange = (recordId: string) => {
     setSelectedRecords((prevSelected) =>
@@ -67,25 +68,23 @@ export default function EmissionRecordDialog({
 
     try {
       const returnEmails =
-        await createEmissionRecord.mutateAsync(newEmissionRecords); //eslint-ignore
+        await createEmissionRecord.mutateAsync(newEmissionRecords);
       console.log(returnEmails);
-      alert("Emission records created successfully");
+      toast.success("Emission records created successfully");
     } catch (error) {
       console.error("Error creating purchase records:", error);
-      alert("Failed to create purchase records.");
+      toast.error("Failed to create purchase records.");
     }
   };
 
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button className="bg-blue-300 hover:bg-blue-700">
-          Request emission record
-        </Button>
+        <Button variant="outline">Request emission record</Button>
       </DialogTrigger>
-      <DialogContent className="min-w-[1000px] min-h-[800] text-cyan-900 font-sans flex flex-col">
+      <DialogContent>
         <DialogHeader className="flex flex-row">
-          <DialogTitle className="text-5xl">Request emissions data</DialogTitle>
+          <DialogTitle>Request emissions data</DialogTitle>
         </DialogHeader>
         <div className="flex flex-grow gap-10 align-top ">
           <div className="flex flex-col flex-grow gap-2 overflow-y-auto max-h-full ">
@@ -98,11 +97,8 @@ export default function EmissionRecordDialog({
             />
           </div>
         </div>
-        <DialogFooter className="sm:justify-end ">
-          <Button
-            onClick={handleCreateEmissionRecords}
-            className="bg-blue-300 hover:bg-blue-700"
-          >
+        <DialogFooter className="sm:justify-end w-auto">
+          <Button onClick={handleCreateEmissionRecords} className="w-auto">
             Request records
           </Button>
         </DialogFooter>
