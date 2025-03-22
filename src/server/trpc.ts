@@ -13,7 +13,6 @@ const isAuthed = t.middleware(async ({ next, ctx }) => {
   if (!ctx.auth.userId) {
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }
-
   return next({ ctx: { auth: ctx.auth, supabase: ctx.supabase } });
 });
 

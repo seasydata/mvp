@@ -56,6 +56,10 @@ const columns: ColumnDef<EnrichedPurchaseRecord>[] = [
     ),
   },
   {
+    accessorKey: "comment",
+    header: "Comment",
+  },
+  {
     accessorKey: "organizationName",
     header: "Supplier",
     cell: ({ row }) => {

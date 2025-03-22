@@ -143,43 +143,24 @@ export const emissionRecordRouter = createTRPCRouter({
           });
         }
 
-        const testHTML = newEmissionRecords
-          .map((record: EmissionRecord) => {
-            const emailObj = emailData.find(
-              (email) => email.productId === record.productId,
-            );
+        const resend = new Resend(process.env.RESEND_API_KEY);
+
+        await Promise.all(newEmissionRecords
+          .map(async (record: EmissionRecord) => {
+            const emailObj = emailData.find((email) => email.productId === record.productId);
             if (emailObj) {
-              return `<p>Please submit your data at the following link: 
-          <a href="https://seasydata.com/submit-data/${record.id}">Submit Data</a>
-          </p>`;
+              const response = await resend.emails.send({
+                from: "no-reply@seasydata.com",
+                to: emailObj.Organization.email,
+                subject: `Request for emission records on product ${emailObj.productName}`,
+                html: `<p>Please submit your data at the following link: 
+                      <a href="https://seasydata.com/submit-data/${record.id}">Submit Data</a>
+                  </p>`,
+              });
+              console.log(response)
             }
-            return null;
-          })
-          .filter(Boolean);
-
-        return testHTML;
-
-        // const resend = new Resend(process.env.RESEND_API_KEY);
-
-        // await Promise.all(
-        //   newEmissionRecords.map(async (record: EmissionRecord) => {
-        //     const emailObj: {
-        //       id: string;
-        //       name: string;
-        //       Organization: { email: string };
-        //     } = emailData.find((email) => email.id === record.productId);
-        //     if (emailObj) {
-        //       await resend.emails.send({
-        //         from: "no-reply@seasydata.com",
-        //         to: emailObj.Organization.email,
-        //         subject: `Request for emission records on product ${emailObj.name}`,
-        //         html: `<p>Please submit your data at the following link:
-        //               <a href="https://seasydata.com/submit-data/${record.id}">Submit Data</a>
-        //           </p>`,
-        //       });
-        //     }
-        //   }),
-        // );
+          }),
+        );
       }
     }),
 });

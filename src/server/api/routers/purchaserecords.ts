@@ -56,8 +56,7 @@ export const purchaseRecordRouter = createTRPCRouter({
       ...Product!inner(productId, productName, description,
         ...Organization!inner(organizationId, organizationName)
         )`)
-      .in("Product.Organization.organizationId", flatIds)
-      .returns();
+      .in("Product.Organization.organizationId", flatIds);
     if (purchaseRecordsError) {
       throw new Error(purchaseRecordsError.message);
     }
@@ -93,12 +92,12 @@ export const purchaseRecordRouter = createTRPCRouter({
       const completeInput = input.map((record) => ({ ...record, customerOrgId: orgData.organizationId })) // eslint-disable-line
 
 
-      // const { data, error } = await ctx.supabase
-      //   .from("PurchaseRecord")
-      //   .insert(input);
-      // if (error) {
-      //   throw new Error(error.message);
-      // }
-      // return data;
+      const { data, error } = await ctx.supabase
+        .from("PurchaseRecord")
+        .insert(completeInput);
+      if (error) {
+        throw new Error(error.message);
+      }
+      return data;
     }),
 });
