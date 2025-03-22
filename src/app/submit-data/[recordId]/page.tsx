@@ -1,28 +1,35 @@
-"use server";
-
 import { type EnrichedEmissionRecord } from "~/server/api/routers/emissionrecords";
 import SubmitData from "../submit-data";
 import { getHelper } from "~/app/_trpc/helper";
+import { notFound } from "next/navigation";
 
-// { onClose }: { onClose: () => void }
 export default async function DataSubmission({
   params,
 }: {
-  params: Promise<string>;
+  params: Promise<{ recordId: string }>;
 }) {
-  const emissionRecordId: string = await params;
-  const helper = await getHelper();
-  const emissionRecord: EnrichedEmissionRecord = await
-    helper.emissionRecord.getSingle.fetch({
-      emissionRecordId: emissionRecordId
-    });
+  const { recordId } = await params;
 
-  if (!emissionRecord) {
-    return <h1>404 - Page Not Found</h1>;
+  const helper = await getHelper();
+
+  try {
+    const emissionRecord: EnrichedEmissionRecord =
+      await helper.emissionRecord.getSingle.fetch({
+        emissionRecordId: recordId,
+      });
+
+    if (!emissionRecord) {
+      notFound();
+    }
+
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <SubmitData emissionRecord={emissionRecord} />
+      </div>
+    );
+  } catch (error) {
+    // Handle any errors by redirecting to 404 page
+    console.error("Error fetching emission record:", error);
+    notFound();
   }
-  return (
-    <div>
-      <SubmitData emissionRecord={emissionRecord} />
-    </div>
-  );
 }
