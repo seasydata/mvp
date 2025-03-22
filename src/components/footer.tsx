@@ -94,7 +94,7 @@ const Footer = () => {
 
         {/* Copyright - cleaner look */}
         <div className="mt-8 pt-4 border-t border-cyan-700/30 text-center text-cyan-100/70 text-xs">
-          © 2024 Seasy Data. All Rights Reserved
+          © {new Date().getFullYear()} Seasy Data. All Rights Reserved
         </div>
       </div>
     </footer>
