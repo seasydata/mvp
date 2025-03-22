@@ -32,7 +32,8 @@ export default function PurchaseRecordDialog({
   products: EnrichedProduct[];
 }) {
   const createPurchaseRecord = trpc.purchaseRecord.create.useMutation();
-
+  const [quantities, setQuantities] = useState<Record<string, number>>({})
+  const [comments, setComments] = useState<Record<string, string>>({})
   const [selectedOrganizations, setSelectedOrganizations] = useState<string[]>(
     [],
   );
@@ -89,6 +90,20 @@ export default function PurchaseRecordDialog({
     );
   };
 
+  const handleQuantityChange = (productId: string, value: string) => {
+    const numericValue = parseInt(value, 10);
+    setQuantities((prevQuantities) => ({
+      ...prevQuantities,
+      [productId]: isNaN(numericValue) ? 0 : numericValue,
+    }));
+  };
+  const handleCommentChange = (productId: string, comment: string) => {
+    setComments((prevComments) => ({
+      ...prevComments,
+      [productId]: comment,
+    }));
+  };
+
   const handleCreatePurchaseRecords = async () => {
     if (selectedProducts.length === 0) {
       toast.warning("Please select at least one product");
@@ -100,9 +115,9 @@ export default function PurchaseRecordDialog({
       .map((product) => ({
         supplierOrgId: product.organizationId,
         productId: product.productId,
-        quantity: 1, // Default to 1 instead of 0
+        quantity: quantities[product.productId] ?? 0,
         purchaseDate: new Date().toISOString(),
-        comment: "",
+        comment: comments[product.productId] ?? "",
       }));
 
     try {
@@ -140,11 +155,33 @@ export default function PurchaseRecordDialog({
       },
     },
     {
+      accessorKey: "quantity", header: "Quantity", cell: ({ row }) => (
+        <input
+          type="number"
+          min="0"
+          // defaultValue={0}
+          className="border rounded p-1 w-20"
+          defaultValue={quantities[row.original.productId]}
+          onBlur={(e) => handleQuantityChange(row.original.productId, e.target.value)}
+        />
+      )
+    },
+    {
       accessorKey: "unit",
       header: "Unit",
       cell: ({ row }) => (
-        <div className="text-center">{row.getValue("unit") || "-"}</div>
+        <div className="text-center">{row.getValue("unit") ?? "-"}</div>
       ),
+    },
+    {
+      accessorKey: "comment", header: "Comment", cell: ({ row }) => (
+        <input
+          type="text"
+          className="border rounded p-1 w-full"
+          defaultValue={comments[row.original.productId] ?? ""} // Default value
+          onBlur={(e) => handleCommentChange(row.original.productId, e.target.value)} // Capture value on blur
+        />
+      )
     },
     {
       accessorKey: "organizationName",
@@ -253,11 +290,10 @@ export default function PurchaseRecordDialog({
                       {filteredOrganizations.map((org) => (
                         <label
                           key={org.organizationId}
-                          className={`flex items-center gap-2 cursor-pointer p-2 rounded-md transition-colors ${
-                            selectedOrganizations.includes(org.organizationId)
-                              ? "bg-cyan-50 text-cyan-900"
-                              : "hover:bg-gray-50"
-                          }`}
+                          className={`flex items-center gap-2 cursor-pointer p-2 rounded-md transition-colors ${selectedOrganizations.includes(org.organizationId)
+                            ? "bg-cyan-50 text-cyan-900"
+                            : "hover:bg-gray-50"
+                            }`}
                         >
                           <Checkbox
                             checked={selectedOrganizations.includes(
@@ -354,7 +390,7 @@ export default function PurchaseRecordDialog({
                         <p className="text-gray-500 mb-2">No products found</p>
                         <p className="text-sm text-gray-400">
                           {selectedOrganizations.length > 0 &&
-                          !productSearchTerm
+                            !productSearchTerm
                             ? "Try selecting different organizations or clearing your filters"
                             : productSearchTerm
                               ? "Try using different search terms"
@@ -373,9 +409,8 @@ export default function PurchaseRecordDialog({
           <div className="w-full flex justify-between items-center">
             <div className="text-sm text-gray-500">
               {selectedProducts.length > 0
-                ? `You've selected ${selectedProducts.length} product${
-                    selectedProducts.length > 1 ? "s" : ""
-                  }`
+                ? `You've selected ${selectedProducts.length} product${selectedProducts.length > 1 ? "s" : ""
+                }`
                 : "Select products to add as purchase records"}
             </div>
             <Button
