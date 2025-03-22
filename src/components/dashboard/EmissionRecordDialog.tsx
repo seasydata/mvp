@@ -17,6 +17,7 @@ import type { EnrichedPurchaseRecord } from "~/server/api/routers/purchaserecord
 import type { ColumnDef } from "@tanstack/react-table";
 import { Checkbox } from "../ui/checkbox";
 import { toast } from "sonner";
+import { PlusIcon } from "lucide-react";
 
 export default function EmissionRecordDialog({
   purchaseRecords,
@@ -53,7 +54,6 @@ export default function EmissionRecordDialog({
   ];
 
   const handleCreateEmissionRecords = async () => {
-    // console.log(purchaseRecords)
     const newEmissionRecords = purchaseRecords
       .filter((record) => selectedRecords.includes(record.productId))
       .map((record) => ({
@@ -69,7 +69,6 @@ export default function EmissionRecordDialog({
     try {
       const returnEmails =
         await createEmissionRecord.mutateAsync(newEmissionRecords);
-      console.log(returnEmails);
       toast.success("Emission records created successfully");
     } catch (error) {
       console.error("Error creating purchase records:", error);
@@ -80,7 +79,10 @@ export default function EmissionRecordDialog({
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline">Request emission record</Button>
+        <Button variant="outline">
+          <PlusIcon className="h-4 w-4" />
+          Request emission record
+        </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader className="flex flex-row">

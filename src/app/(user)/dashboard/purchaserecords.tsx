@@ -25,7 +25,10 @@ const columns: ColumnDef<EnrichedPurchaseRecord>[] = [
     cell: ({ row }) => {
       const description = row.getValue("description") as string;
       return description ? (
-        <div className="max-w-[250px] truncate" title={description}>
+        <div
+          className="max-w-[150px] sm:max-w-[250px] truncate"
+          title={description}
+        >
           {description}
         </div>
       ) : (
@@ -55,9 +58,14 @@ const columns: ColumnDef<EnrichedPurchaseRecord>[] = [
   {
     accessorKey: "organizationName",
     header: "Supplier",
-    cell: ({ row }) => (
-      <div className="font-medium">{row.getValue("organizationName")}</div>
-    ),
+    cell: ({ row }) => {
+      const name = row.getValue("organizationName") as string;
+      return name ? (
+        <div className="max-w-[120px] sm:max-w-full truncate" title={name}>
+          {name}
+        </div>
+      ) : null;
+    },
   },
 ];
 
@@ -116,15 +124,17 @@ export default function PurchaseRecords({
             />
           </div>
 
-          {filteredRecords.length > 0 ? (
-            <DataTable columns={columns} data={filteredRecords} />
-          ) : (
-            <div className="text-center py-8 text-gray-500">
-              {searchTerm
-                ? "No records match your search"
-                : "No purchase records found"}
-            </div>
-          )}
+          <div className="overflow-x-auto">
+            {filteredRecords.length > 0 ? (
+              <DataTable columns={columns} data={filteredRecords} />
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                {searchTerm
+                  ? "No records match your search"
+                  : "No purchase records found"}
+              </div>
+            )}
+          </div>
         </CardContent>
       </Card>
     </div>

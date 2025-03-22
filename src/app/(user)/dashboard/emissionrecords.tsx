@@ -64,6 +64,14 @@ const columns: ColumnDef<EnrichedEmissionRecord>[] = [
   {
     accessorKey: "source",
     header: "Source",
+    cell: ({ row }) => {
+      const source = row.getValue("source") as string;
+      return source ? (
+        <div className="max-w-[100px] sm:max-w-[200px] truncate" title={source}>
+          {source}
+        </div>
+      ) : null;
+    },
   },
   {
     accessorKey: "comment",
@@ -71,7 +79,10 @@ const columns: ColumnDef<EnrichedEmissionRecord>[] = [
     cell: ({ row }) => {
       const comment = row.getValue("comment") as string;
       return comment ? (
-        <div className="max-w-[200px] truncate" title={comment}>
+        <div
+          className="max-w-[100px] sm:max-w-[200px] truncate"
+          title={comment}
+        >
           {comment}
         </div>
       ) : null;
@@ -80,6 +91,14 @@ const columns: ColumnDef<EnrichedEmissionRecord>[] = [
   {
     accessorKey: "organizationName",
     header: "Supplier",
+    cell: ({ row }) => {
+      const name = row.getValue("organizationName") as string;
+      return name ? (
+        <div className="max-w-[100px] sm:max-w-[150px] truncate" title={name}>
+          {name}
+        </div>
+      ) : null;
+    },
   },
 ];
 
@@ -110,7 +129,7 @@ export default function EmissionRecords({
       </div>
 
       <Tabs defaultValue="requested" className="w-full">
-        <TabsList className="grid grid-cols-3 mb-4">
+        <TabsList className="grid grid-cols-3 mb-4 text-xs sm:text-sm">
           <TabsTrigger
             value="requested"
             className="data-[state=active]:bg-amber-100"
@@ -132,33 +151,39 @@ export default function EmissionRecords({
         </TabsList>
 
         <TabsContent value="requested" className="mt-0">
-          {requestedRecords.length > 0 ? (
-            <DataTable columns={columns} data={requestedRecords} />
-          ) : (
-            <div className="text-center py-8 text-gray-500">
-              No requested emission records found
-            </div>
-          )}
+          <div className="overflow-x-auto">
+            {requestedRecords.length > 0 ? (
+              <DataTable columns={columns} data={requestedRecords} />
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                No requested emission records found
+              </div>
+            )}
+          </div>
         </TabsContent>
 
         <TabsContent value="completed" className="mt-0">
-          {completedRecords.length > 0 ? (
-            <DataTable columns={columns} data={completedRecords} />
-          ) : (
-            <div className="text-center py-8 text-gray-500">
-              No completed emission records found
-            </div>
-          )}
+          <div className="overflow-x-auto">
+            {completedRecords.length > 0 ? (
+              <DataTable columns={columns} data={completedRecords} />
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                No completed emission records found
+              </div>
+            )}
+          </div>
         </TabsContent>
 
         <TabsContent value="draft" className="mt-0">
-          {draftRecords.length > 0 ? (
-            <DataTable columns={columns} data={draftRecords} />
-          ) : (
-            <div className="text-center py-8 text-gray-500">
-              No draft emission records found
-            </div>
-          )}
+          <div className="overflow-x-auto">
+            {draftRecords.length > 0 ? (
+              <DataTable columns={columns} data={draftRecords} />
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                No draft emission records found
+              </div>
+            )}
+          </div>
         </TabsContent>
       </Tabs>
     </div>

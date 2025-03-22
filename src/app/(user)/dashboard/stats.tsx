@@ -34,7 +34,7 @@ export default async function Stats({
     <div className="space-y-6">
       <h2 className="text-xl font-semibold text-cyan-900">Overview</h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="bg-gradient-to-br from-cyan-50 to-cyan-100 rounded-lg p-6 shadow-sm border border-cyan-200">
           <div className="flex items-center gap-4">
             <div className="bg-cyan-600 text-white p-3 rounded-full">

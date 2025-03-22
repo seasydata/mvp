@@ -43,7 +43,6 @@ export const emissionRecordRouter = createTRPCRouter({
     const userOrgIds = supaUser.UserOrganization.map(
       (userOrg: { organizationId: string }) => userOrg.organizationId,
     );
-    console.log(userOrgIds);
 
     const { data: organizations, error: organizationsError } =
       await ctx.supabase
@@ -62,8 +61,6 @@ export const emissionRecordRouter = createTRPCRouter({
     const orgIds = organizations.map(
       (organization: { organizationId: string }) => organization.organizationId,
     );
-    console.log(orgIds);
-
     const { data: emissionRecords, error } = await ctx.supabase
       .from("EmissionRecord")
       .select(
@@ -121,8 +118,6 @@ export const emissionRecordRouter = createTRPCRouter({
         const requestedProductIds = input
           .filter((record) => record.status == "requested")
           .map((record: CreateEmissionRecord) => record.productId);
-
-        // console.log(requestedProductIds)
 
         const { data: emailData, error: emailError } = await ctx.supabase
           .from("Product")
