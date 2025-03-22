@@ -1,6 +1,7 @@
 "use client";
 
 import SubmissionHeader from "~/components/submissionheader";
+import Footer from "~/components/footer";
 
 export default function RootLayout({
   children,
@@ -8,9 +9,10 @@ export default function RootLayout({
   return (
     <>
       <SubmissionHeader />
-      <main className="w-4/5 mx-auto" style={{ height: "calc(100vh - 6rem)" }}>
+      <main className="min-h-[calc(100vh-5rem)] flex flex-col justify-start">
         {children}
       </main>
+      <Footer />
     </>
   );
 }

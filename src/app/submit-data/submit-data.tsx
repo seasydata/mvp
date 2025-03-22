@@ -36,7 +36,7 @@ import { z } from "zod";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Calendar } from "@/components/ui/calendar";
-
+import { nb } from "date-fns/locale";
 import { Card, CardHeader, CardTitle, CardContent } from "~/components/ui/card";
 
 export default function SubmitData({

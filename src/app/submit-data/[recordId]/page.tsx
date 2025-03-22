@@ -10,6 +10,11 @@ export default async function DataSubmission({
 }) {
   const { recordId } = await params;
 
+  // Explicitly check for 'demo' route and redirect to 404
+  if (recordId === "demo") {
+    notFound();
+  }
+
   const helper = await getHelper();
 
   try {
@@ -23,7 +28,7 @@ export default async function DataSubmission({
     }
 
     return (
-      <div className="container mx-auto px-4 py-8">
+      <div className="w-full">
         <SubmitData emissionRecord={emissionRecord} />
       </div>
     );
