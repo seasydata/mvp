@@ -1,18 +1,15 @@
-'use client'
-import Footer from '~/components/footer';
-import Header from '~/components/header';
-
+"use client";
+import Footer from "~/components/footer";
+import Header from "~/components/header";
 
 export default function RootLayout({
-    children,
+  children,
 }: Readonly<{ children: React.ReactNode }>) {
-    return (
-        <div className='dashboard-layout'>
-            <Header/>
-            <main className="w-4/5 mx-auto pb-10 pt-5   ">
-                {children}
-            </main>
-            <Footer />
-        </div>        
-    );
+  return (
+    <div>
+      <Header />
+      <main className="w-full px-4 sm:px-6 pb-10 pt-5">{children}</main>
+      <Footer />
+    </div>
+  );
 }

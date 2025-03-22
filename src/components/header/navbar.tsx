@@ -6,7 +6,7 @@ import {
   SignedIn,
   SignedOut,
   UserButton,
-} from '@clerk/nextjs'
+} from "@clerk/nextjs";
 import Link from "next/link";
 //import { Button } from "@mui/material";
 import CustomButton from "../styles/custom-button";
@@ -84,22 +84,24 @@ const Navbar: React.FC = () => {
             </SignInButton>
           </SignedOut>
           <SignedIn>
-            Hello
-            <CustomButton variant="outlined" className="md-and-down:hidden" onClick={() => router.push("/dashboard")}>
+            <CustomButton
+              variant="outlined"
+              className="md-and-down:hidden"
+              onClick={() => router.push("/dashboard")}
+            >
               Dashboard
             </CustomButton>
             <SignOutButton>
-
               <CustomButton
                 variant="outlined"
                 className="md-and-down:hidden uppercase"
-                >
+              >
                 Sign out
               </CustomButton>
             </SignOutButton>
             <UserButton />
           </SignedIn>
-          
+
           <CustomButton
             variant="outlined"
             className="md-and-down:hidden uppercase"

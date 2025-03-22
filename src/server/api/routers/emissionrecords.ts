@@ -1,9 +1,6 @@
 import { z } from "zod";
 import { protectedProcedure, createTRPCRouter } from "../../trpc";
-import type {
-  CreateEmissionRecord,
-  EmissionRecord,
-} from "~/server/types";
+import type { CreateEmissionRecord, EmissionRecord } from "~/server/types";
 import { Resend } from "resend";
 import { TRPCError } from "@trpc/server";
 
@@ -11,19 +8,25 @@ export type EnrichedEmissionRecord = EmissionRecord & {
   productId: string;
   productName: string;
   organizationName: string;
-}
+};
 
 export const emissionRecordRouter = createTRPCRouter({
   getSingle: protectedProcedure
     .input(z.object({ emissionRecordId: z.string() }))
     .query(async ({ ctx, input }) => {
-      const { data: emissionRecordData, error: emissionRecordError } = await ctx.supabase
-        .from("EmissionRecord")
-        .select(`*, ...Product(productId, productName, ...Organization(organizationName))`)
-        .eq("id", input.emissionRecordId)
-        .single<EnrichedEmissionRecord>();
+      const { data: emissionRecordData, error: emissionRecordError } =
+        await ctx.supabase
+          .from("EmissionRecord")
+          .select(
+            `*, ...Product(productId, productName, ...Organization(organizationName))`,
+          )
+          .eq("emissionId", input.emissionRecordId)
+          .single<EnrichedEmissionRecord>();
       if (emissionRecordError) {
-        throw new TRPCError({ message: emissionRecordError.message, code: "NOT_FOUND" });
+        throw new TRPCError({
+          message: emissionRecordError.message,
+          code: "NOT_FOUND",
+        });
       }
       return emissionRecordData;
     }),
@@ -37,29 +40,31 @@ export const emissionRecordRouter = createTRPCRouter({
     if (!supaUser || userError) {
       throw new Error("User not activated");
     }
-    const userOrgIds = supaUser.UserOrganization.map((userOrg: { organizationId: string }) => userOrg.organizationId)
-    console.log(userOrgIds)
+    const userOrgIds = supaUser.UserOrganization.map(
+      (userOrg: { organizationId: string }) => userOrg.organizationId,
+    );
 
     const { data: organizations, error: organizationsError } =
       await ctx.supabase
         .from("Organization")
-        .select(`
+        .select(
+          `
         organizationId, 
         OrgRelation!inner!supplierOrgId(customerOrgId)
-        `)
-        .in("OrgRelation.customerOrgId", userOrgIds).returns<{ organizationId: string; OrgRelation: never }[]>();
+        `,
+        )
+        .in("OrgRelation.customerOrgId", userOrgIds)
+        .returns<{ organizationId: string; OrgRelation: never }[]>();
     if (!organizations || organizationsError) {
       throw new Error(organizationsError.message);
     }
-    const orgIds = organizations.map((organization: { organizationId: string }) =>
-      organization.organizationId
+    const orgIds = organizations.map(
+      (organization: { organizationId: string }) => organization.organizationId,
     );
-    console.log(orgIds)
-
-
     const { data: emissionRecords, error } = await ctx.supabase
       .from("EmissionRecord")
-      .select(`
+      .select(
+        `
       *,
       ...Product!inner (
         productName,
@@ -67,12 +72,10 @@ export const emissionRecordRouter = createTRPCRouter({
       ...Organization!inner(organizationId, organizationName)
       )`,
       )
-      .in(
-        "Product.Organization.organizationId", orgIds
-      );
+      .in("Product.Organization.organizationId", orgIds);
 
     if (error) {
-      throw new TRPCError({ message: error.message, code: "NOT_FOUND" })
+      throw new TRPCError({ message: error.message, code: "NOT_FOUND" });
     }
 
     return emissionRecords as EnrichedEmissionRecord[];
@@ -83,11 +86,17 @@ export const emissionRecordRouter = createTRPCRouter({
       z
         .object({
           productId: z.string(),
-          status: z.string().pipe(z.enum(["fulfilled", "draft", "requested"])).default("draft"),
+          status: z
+            .string()
+            .pipe(z.enum(["fulfilled", "draft", "requested"]))
+            .default("draft"),
           recordDate: z.string().datetime(),
           source: z.string().nullable(),
           CO2e: z.number(),
-          calculationMethod: z.string().pipe(z.enum(["AR4", "AR5", "AR6"])).nullable(),
+          calculationMethod: z
+            .string()
+            .pipe(z.enum(["AR4", "AR5", "AR6"]))
+            .nullable(),
           comment: z.string().nullable(),
         })
         .array(),
@@ -110,8 +119,6 @@ export const emissionRecordRouter = createTRPCRouter({
           .filter((record) => record.status == "requested")
           .map((record: CreateEmissionRecord) => record.productId);
 
-        // console.log(requestedProductIds)
-
         const { data: emailData, error: emailError } = await ctx.supabase
           .from("Product")
           .select(
@@ -119,11 +126,14 @@ export const emissionRecordRouter = createTRPCRouter({
         productId, productName, Organization(email, organizationName)
         `,
           )
-          .in("productId", requestedProductIds).returns<{
-            productId: string;
-            productName: string;
-            Organization: { email: string, organizationName: string }
-          }[]>();
+          .in("productId", requestedProductIds)
+          .returns<
+            {
+              productId: string;
+              productName: string;
+              Organization: { email: string; organizationName: string };
+            }[]
+          >();
 
         if (emailError) {
           throw new TRPCError({
@@ -135,7 +145,9 @@ export const emissionRecordRouter = createTRPCRouter({
 
         const testHTML = newEmissionRecords
           .map((record: EmissionRecord) => {
-            const emailObj = emailData.find((email) => email.productId === record.productId);
+            const emailObj = emailData.find(
+              (email) => email.productId === record.productId,
+            );
             if (emailObj) {
               return `<p>Please submit your data at the following link: 
           <a href="https://seasydata.com/submit-data/${record.id}">Submit Data</a>
@@ -161,7 +173,7 @@ export const emissionRecordRouter = createTRPCRouter({
         //         from: "no-reply@seasydata.com",
         //         to: emailObj.Organization.email,
         //         subject: `Request for emission records on product ${emailObj.name}`,
-        //         html: `<p>Please submit your data at the following link: 
+        //         html: `<p>Please submit your data at the following link:
         //               <a href="https://seasydata.com/submit-data/${record.id}">Submit Data</a>
         //           </p>`,
         //       });

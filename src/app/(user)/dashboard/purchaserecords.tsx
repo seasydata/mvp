@@ -1,58 +1,142 @@
-import { DataTable } from "~/components/dashboard/data-table";
+"use client";
+
+import { DataTable } from "~/components/ui/data-table";
 import type { ColumnDef } from "@tanstack/react-table";
 import type { EnrichedPurchaseRecord } from "~/server/api/routers/purchaserecords";
 import PurchaseRecordDialog from "~/components/dashboard/PurchaseRecordDialog";
 import type { EnrichedProduct } from "~/server/api/routers/products";
 import { type Organization } from "~/server/types";
+import { Card, CardContent } from "~/components/ui/card";
+import { Input } from "~/components/ui/input";
+import { useState } from "react";
+import { Search } from "lucide-react";
 
 const columns: ColumnDef<EnrichedPurchaseRecord>[] = [
   {
     accessorKey: "productName",
     header: "Product",
+    cell: ({ row }) => (
+      <div className="font-medium">{row.getValue("productName")}</div>
+    ),
   },
   {
     accessorKey: "description",
     header: "Description",
+    cell: ({ row }) => {
+      const description = row.getValue("description") as string;
+      return description ? (
+        <div
+          className="max-w-[150px] sm:max-w-[250px] truncate"
+          title={description}
+        >
+          {description}
+        </div>
+      ) : (
+        <div className="text-gray-500 italic">No description</div>
+      );
+    },
   },
   {
     accessorKey: "purchaseDate",
     header: "Date Purchased",
+    cell: ({ row }) => {
+      const date = row.getValue("purchaseDate");
+      return date ? (
+        <div className="text-sm text-gray-500">
+          {new Date(date as string).toLocaleDateString()}
+        </div>
+      ) : null;
+    },
   },
   {
     accessorKey: "quantity",
     header: "Quantity",
+    cell: ({ row }) => (
+      <div className="text-right font-medium">{row.getValue("quantity")}</div>
+    ),
   },
   {
     accessorKey: "organizationName",
     header: "Supplier",
+    cell: ({ row }) => {
+      const name = row.getValue("organizationName") as string;
+      return name ? (
+        <div className="max-w-[120px] sm:max-w-full truncate" title={name}>
+          {name}
+        </div>
+      ) : null;
+    },
   },
 ];
 
-export default async function PurchaseRecords({
+export default function PurchaseRecords({
   purchaseRecords,
   organizations,
-  products
+  products,
 }: {
   purchaseRecords: EnrichedPurchaseRecord[];
   organizations: Organization[];
   products: EnrichedProduct[];
 }) {
+  const [filteredRecords, setFilteredRecords] = useState(purchaseRecords);
+  const [searchTerm, setSearchTerm] = useState("");
 
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.toLowerCase();
+    setSearchTerm(value);
+
+    if (!value.trim()) {
+      setFilteredRecords(purchaseRecords);
+      return;
+    }
+
+    const filtered = purchaseRecords.filter(
+      (record) =>
+        record.productName?.toLowerCase().includes(value) ||
+        record.description?.toLowerCase().includes(value) ||
+        record.organizationName?.toLowerCase().includes(value),
+    );
+
+    setFilteredRecords(filtered);
+  };
 
   return (
-    <>
-      <div className="flex flex-row items-center space-x-10  pt-10">
-        <div className=" font-bold">PURCHASE RECORDS</div>
-        <div className="ml-10">
-          <PurchaseRecordDialog
-            organizations={organizations}
-            products={products}
-          />
-        </div>
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <h2 className="text-xl font-semibold text-cyan-900">
+          Purchase Records
+        </h2>
+        <PurchaseRecordDialog
+          organizations={organizations}
+          products={products}
+        />
       </div>
-      <div className="pt-10">
-        <DataTable columns={columns} data={purchaseRecords} />
-      </div>
-    </>
+
+      <Card className="border-gray-200">
+        <CardContent className="p-4">
+          <div className="relative mb-6">
+            <Search className="absolute left-3 top-3 h-4 w-4 text-gray-500" />
+            <Input
+              placeholder="Search products, descriptions or suppliers..."
+              className="pl-10"
+              value={searchTerm}
+              onChange={handleSearch}
+            />
+          </div>
+
+          <div className="overflow-x-auto">
+            {filteredRecords.length > 0 ? (
+              <DataTable columns={columns} data={filteredRecords} />
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                {searchTerm
+                  ? "No records match your search"
+                  : "No purchase records found"}
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
 }
