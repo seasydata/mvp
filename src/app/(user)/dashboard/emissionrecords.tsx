@@ -33,13 +33,13 @@ const columns: ColumnDef<EnrichedEmissionRecord>[] = [
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => {
-      const status = row.getValue("status") as string;
+      const status: string = row.getValue("status");
       return (
         <Badge
           className={
             status === "requested"
               ? "bg-amber-100 text-amber-800 hover:bg-amber-100"
-              : status === "completed"
+              : status === "fulfilled"
                 ? "bg-green-100 text-green-800 hover:bg-green-100"
                 : "bg-blue-100 text-blue-800 hover:bg-blue-100"
           }
@@ -55,9 +55,9 @@ const columns: ColumnDef<EnrichedEmissionRecord>[] = [
     cell: ({ row }) => {
       const value = row.getValue("CO2e");
       return value ? (
-        <div className="text-right font-medium">{value as number}</div>
+        <div className="text-left font-medium">{value as number}</div>
       ) : (
-        <div className="text-right text-gray-500">-</div>
+        <div className="text-left text-gray-500">-</div>
       );
     },
   },
@@ -65,9 +65,9 @@ const columns: ColumnDef<EnrichedEmissionRecord>[] = [
     accessorKey: "source",
     header: "Source",
     cell: ({ row }) => {
-      const source = row.getValue("source") as string;
+      const source: string = row.getValue("source");
       return source ? (
-        <div className="max-w-[100px] sm:max-w-[200px] truncate" title={source}>
+        <div className="sm:max-w-[200px] xl:max-w-[300px] truncate" title={source}>
           {source}
         </div>
       ) : null;
@@ -77,10 +77,10 @@ const columns: ColumnDef<EnrichedEmissionRecord>[] = [
     accessorKey: "comment",
     header: "Comment",
     cell: ({ row }) => {
-      const comment = row.getValue("comment") as string;
+      const comment: string = row.getValue("comment");
       return comment ? (
         <div
-          className="max-w-[100px] sm:max-w-[200px] truncate"
+          className=" sm:max-w-[200px] lg:max-w-[250px] xl:max-w-[250px] truncate"
           title={comment}
         >
           {comment}
@@ -92,7 +92,7 @@ const columns: ColumnDef<EnrichedEmissionRecord>[] = [
     accessorKey: "organizationName",
     header: "Supplier",
     cell: ({ row }) => {
-      const name = row.getValue("organizationName") as string;
+      const name: string = row.getValue("organizationName");
       return name ? (
         <div className="max-w-[100px] sm:max-w-[150px] truncate" title={name}>
           {name}
@@ -112,8 +112,8 @@ export default function EmissionRecords({
   const requestedRecords = emissionRecords.filter(
     (record) => record.status === "requested",
   );
-  const completedRecords = emissionRecords.filter(
-    (record) => record.status === "completed",
+  const fulfilledRecords = emissionRecords.filter(
+    (record) => record.status === "fulfilled",
   );
   const draftRecords = emissionRecords.filter(
     (record) => record.status === "draft",
@@ -137,10 +137,10 @@ export default function EmissionRecords({
             Requested ({requestedRecords.length})
           </TabsTrigger>
           <TabsTrigger
-            value="completed"
+            value="fulfilled"
             className="data-[state=active]:bg-green-100"
           >
-            Completed ({completedRecords.length})
+            fulfilled ({fulfilledRecords.length})
           </TabsTrigger>
           <TabsTrigger
             value="draft"
@@ -162,13 +162,13 @@ export default function EmissionRecords({
           </div>
         </TabsContent>
 
-        <TabsContent value="completed" className="mt-0">
+        <TabsContent value="fulfilled" className="mt-0">
           <div className="overflow-x-auto">
-            {completedRecords.length > 0 ? (
-              <DataTable columns={columns} data={completedRecords} />
+            {fulfilledRecords.length > 0 ? (
+              <DataTable columns={columns} data={fulfilledRecords} />
             ) : (
               <div className="text-center py-8 text-gray-500">
-                No completed emission records found
+                No fulfilled emission records found
               </div>
             )}
           </div>

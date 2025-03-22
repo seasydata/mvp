@@ -23,10 +23,10 @@ const columns: ColumnDef<EnrichedPurchaseRecord>[] = [
     accessorKey: "description",
     header: "Description",
     cell: ({ row }) => {
-      const description = row.getValue("description") as string;
+      const description: string = row.getValue("description");
       return description ? (
         <div
-          className="max-w-[150px] sm:max-w-[250px] truncate"
+          className="sm:max-w-[250px] truncate lg:max-w-[400px] xl:max-w-[400px]"
           title={description}
         >
           {description}
@@ -52,7 +52,7 @@ const columns: ColumnDef<EnrichedPurchaseRecord>[] = [
     accessorKey: "quantity",
     header: "Quantity",
     cell: ({ row }) => (
-      <div className="text-right font-medium">{row.getValue("quantity")}</div>
+      <div className="text-left font-medium">{row.getValue("quantity")}</div>
     ),
   },
   {
@@ -63,7 +63,7 @@ const columns: ColumnDef<EnrichedPurchaseRecord>[] = [
     accessorKey: "organizationName",
     header: "Supplier",
     cell: ({ row }) => {
-      const name = row.getValue("organizationName") as string;
+      const name: string = row.getValue("organizationName");
       return name ? (
         <div className="max-w-[120px] sm:max-w-full truncate" title={name}>
           {name}

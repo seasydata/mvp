@@ -2,7 +2,7 @@ import { type EnrichedEmissionRecord } from "~/server/api/routers/emissionrecord
 import { type EnrichedPurchaseRecord } from "~/server/api/routers/purchaserecords";
 import { BarChartIcon, LayersIcon, PercentIcon } from "lucide-react";
 
-export default async function Stats({
+export default function Stats({
   emissionRecords,
   purchaseRecords,
 }: {

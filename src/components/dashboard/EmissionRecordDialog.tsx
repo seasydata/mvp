@@ -24,10 +24,15 @@ export default function EmissionRecordDialog({
 }: {
   purchaseRecords: EnrichedPurchaseRecord[];
 }) {
-  const createEmissionRecord = trpc.emissionRecord.create.useMutation();
+  const utils = trpc.useUtils()
+  const createEmissionRecord = trpc.emissionRecord.create.useMutation({
+    async onSuccess() {
+      await utils.emissionRecord.getFiltered.invalidate();
+    },
+  })
 
   const [selectedRecords, setSelectedRecords] = useState<string[]>([]);
-  const [source, setSource] = useState<string>("");
+  // const [source, setSource] = useState<string>("");
 
   const handleCheckboxChange = (recordId: string) => {
     setSelectedRecords((prevSelected) =>
@@ -59,16 +64,15 @@ export default function EmissionRecordDialog({
       .map((record) => ({
         productId: record.productId,
         status: "requested" as const,
-        recordDate: new Date().toISOString(),
-        source: source,
-        CO2e: 1,
-        calculationMethod: "AR4",
-        comment: "a comment",
+        recordDate: null,
+        source: null,
+        CO2e: null,
+        calculationMethod: null,
+        comment: null,
       }));
 
     try {
-      const returnEmails =
-        await createEmissionRecord.mutateAsync(newEmissionRecords);
+      await createEmissionRecord.mutateAsync(newEmissionRecords);
       toast.success("Emission records created successfully");
     } catch (error) {
       console.error("Error creating purchase records:", error);

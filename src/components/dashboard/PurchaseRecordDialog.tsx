@@ -31,7 +31,12 @@ export default function PurchaseRecordDialog({
   organizations: Organization[];
   products: EnrichedProduct[];
 }) {
-  const createPurchaseRecord = trpc.purchaseRecord.create.useMutation();
+  const utils = trpc.useUtils()
+  const createPurchaseRecord = trpc.purchaseRecord.create.useMutation({
+    async onSuccess() {
+      await utils.purchaseRecord.getFiltered.invalidate()
+    }
+  });
   const [quantities, setQuantities] = useState<Record<string, number>>({})
   const [comments, setComments] = useState<Record<string, string>>({})
   const [selectedOrganizations, setSelectedOrganizations] = useState<string[]>(
@@ -45,9 +50,7 @@ export default function PurchaseRecordDialog({
 
   // Filter organizations for display based on search
   const filteredOrganizations = organizations.filter(
-    (org) =>
-      !orgSearchTerm ||
-      org.organizationName.toLowerCase().includes(orgSearchTerm.toLowerCase()),
+    (org) => org.organizationName.toLowerCase().includes(orgSearchTerm.toLowerCase()),
   );
 
   useEffect(() => {
@@ -65,8 +68,8 @@ export default function PurchaseRecordDialog({
       const term = productSearchTerm.toLowerCase();
       filtered = filtered.filter(
         (product) =>
-          product.productName?.toLowerCase().includes(term) ||
-          product.description?.toLowerCase().includes(term) ||
+          product.productName?.toLowerCase().includes(term) ??
+          product.description?.toLowerCase().includes(term) ??
           product.organizationName?.toLowerCase().includes(term),
       );
     }
@@ -144,7 +147,7 @@ export default function PurchaseRecordDialog({
       accessorKey: "description",
       header: "Description",
       cell: ({ row }) => {
-        const description = row.getValue("description") as string;
+        const description: string = row.getValue("description");
         return description ? (
           <div className="max-w-[200px] truncate" title={description}>
             {description}
@@ -192,7 +195,7 @@ export default function PurchaseRecordDialog({
     },
     {
       id: "select",
-      header: ({ table }) => (
+      header: ({ }) => (
         <div className="flex justify-center">
           <Checkbox
             checked={

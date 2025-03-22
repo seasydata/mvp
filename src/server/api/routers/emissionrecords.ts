@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { protectedProcedure, createTRPCRouter } from "../../trpc";
+import { protectedProcedure, createTRPCRouter, publicProcedure } from "../../trpc";
 import type { CreateEmissionRecord, EmissionRecord } from "~/server/types";
 import { Resend } from "resend";
 import { TRPCError } from "@trpc/server";
@@ -7,18 +7,23 @@ import { TRPCError } from "@trpc/server";
 export type EnrichedEmissionRecord = EmissionRecord & {
   productId: string;
   productName: string;
+  description: string;
+  organizationId: string;
   organizationName: string;
 };
 
 export const emissionRecordRouter = createTRPCRouter({
-  getSingle: protectedProcedure
+  getSingle: publicProcedure
     .input(z.object({ emissionRecordId: z.string() }))
     .query(async ({ ctx, input }) => {
       const { data: emissionRecordData, error: emissionRecordError } =
         await ctx.supabase
           .from("EmissionRecord")
           .select(
-            `*, ...Product(productId, productName, ...Organization(organizationName))`,
+            `*, 
+            ...Product(productId, productName, description, 
+            ...Organization(organizationId, organizationName)
+            )`,
           )
           .eq("emissionId", input.emissionRecordId)
           .single<EnrichedEmissionRecord>();
@@ -47,8 +52,7 @@ export const emissionRecordRouter = createTRPCRouter({
     const { data: organizations, error: organizationsError } =
       await ctx.supabase
         .from("Organization")
-        .select(
-          `
+        .select(`
         organizationId, 
         OrgRelation!inner!supplierOrgId(customerOrgId)
         `,
@@ -69,6 +73,7 @@ export const emissionRecordRouter = createTRPCRouter({
       ...Product!inner (
         productName,
         productId,
+        description,
       ...Organization!inner(organizationId, organizationName)
       )`,
       )
@@ -90,9 +95,9 @@ export const emissionRecordRouter = createTRPCRouter({
             .string()
             .pipe(z.enum(["fulfilled", "draft", "requested"]))
             .default("draft"),
-          recordDate: z.string().datetime(),
+          recordDate: z.string().datetime().nullable(),
           source: z.string().nullable(),
-          CO2e: z.number(),
+          CO2e: z.number().nullable(),
           calculationMethod: z
             .string()
             .pipe(z.enum(["AR4", "AR5", "AR6"]))
@@ -154,7 +159,7 @@ export const emissionRecordRouter = createTRPCRouter({
                 to: emailObj.Organization.email,
                 subject: `Request for emission records on product ${emailObj.productName}`,
                 html: `<p>Please submit your data at the following link: 
-                      <a href="https://seasydata.com/submit-data/${record.id}">Submit Data</a>
+                      <a href="https://mvp-roan.vercel.app/submit-data/${record.emissionId}">Submit Data</a>
                   </p>`,
               });
               console.log(response)
@@ -163,4 +168,33 @@ export const emissionRecordRouter = createTRPCRouter({
         );
       }
     }),
+
+  fulfill: publicProcedure
+    .input(z
+      .object({
+        emissionId: z.string(),
+        productId: z.string(),
+        status: z
+          .string()
+          .pipe(z.enum(["fulfilled"]))
+          .default("fulfilled"),
+        recordDate: z.string().datetime(),
+        source: z.string(),
+        CO2e: z.number(),
+        calculationMethod: z
+          .string()
+          .pipe(z.enum(["AR4", "AR5", "AR6"])),
+        comment: z.string().nullable(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+
+      const { error } = await ctx.supabase
+        .from("EmissionRecord")
+        .update(input)
+        .eq('emissionId', input.emissionId)
+      if (error) {
+        throw new TRPCError({ message: error.message, code: 'INTERNAL_SERVER_ERROR' })
+      }
+    })
 });

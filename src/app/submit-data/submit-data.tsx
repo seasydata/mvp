@@ -36,14 +36,16 @@ import { z } from "zod";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Calendar } from "@/components/ui/calendar";
-import { nb } from "date-fns/locale";
 import { Card, CardHeader, CardTitle, CardContent } from "~/components/ui/card";
+import { trpc } from "~/server/api/trpc/client";
+import { toast } from "sonner";
 
 export default function SubmitData({
   emissionRecord,
 }: {
   emissionRecord: EnrichedEmissionRecord;
 }) {
+  const fulfillEmissionRecord = trpc.emissionRecord.fulfill.useMutation()
   const formSchema = z.object({
     productId: z.string(),
     recordDate: z.date(),
@@ -61,12 +63,26 @@ export default function SubmitData({
       source: "",
       calculationMethod: undefined,
       comment: "",
+      CO2e: 0,
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    /// convert date to string
-    console.log(values);
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    const input = {
+      ...values,
+      emissionId: emissionRecord.emissionId,
+      recordDate: values.recordDate.toISOString(),
+      status: "fulfilled"
+    };
+    try {
+      await fulfillEmissionRecord.mutateAsync(input)
+      toast.success(
+        `Emissionrecord ${emissionRecord.emissionId} fulfilled successfully!`,
+      );
+    } catch (error) {
+      console.error("Error fulfilling emission record: ", error);
+      toast.error("Failed to fulfill emission record.");
+    }
   }
 
   return (

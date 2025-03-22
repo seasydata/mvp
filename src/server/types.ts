@@ -1,4 +1,4 @@
-import type { Database } from "@/server/database"
+import type { Database } from "@/server/database.types.ts"
 
 // Export each type from the Supabase-generated file, for use in trpc routes and react components.
 export type PurchaseRecord = Database["public"]["Tables"]["PurchaseRecord"]["Row"];

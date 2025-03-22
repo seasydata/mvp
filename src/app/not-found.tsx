@@ -26,7 +26,7 @@ export default function NotFound() {
         <CardContent className="text-center pb-2">
           <p className="text-xl text-cyan-800 mb-2">Page Not Found</p>
           <p className="text-gray-500 mb-6">
-            The page you are looking for doesn't exist or has been moved.
+            The page you are looking for doesn&apos;t exist or has been moved.
           </p>
         </CardContent>
         <CardFooter className="flex justify-center pb-6">
