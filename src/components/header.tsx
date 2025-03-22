@@ -9,15 +9,10 @@ import {
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "./ui/button";
-import { Menu, X } from "lucide-react";
 import { useState } from "react";
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-  const toggleMobileMenu = () => {
-    setMobileMenuOpen(!mobileMenuOpen);
-  };
 
   return (
     <header className="sticky top-0 z-50 w-full bg-white border-b border-gray-100 shadow-sm">
