@@ -1,45 +1,41 @@
-## Contributing
-
-Use "{user}/{branch-purpose}" as branch names, e.g. "ianmaks/updating-readme".
-
-When contributing, first run prettier on local feature branch:
-
-```
-npx prettier . --write
-```
-
-Then pull main and rebase feature on main, before pushing feature and creating a pull request.
-
-# Create T3 App
-
-This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
-
-## What's next? How do I make an app with this?
-
-We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
-
-If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
-
+## Teknologier brukt i prosjektet
 - [Next.js](https://nextjs.org)
-- [NextAuth.js](https://next-auth.js.org)
-- [Prisma](https://prisma.io)
-- [Drizzle](https://orm.drizzle.team)
 - [Tailwind CSS](https://tailwindcss.com)
 - [tRPC](https://trpc.io)
+- [Clerk](https://clerk.dev) (for autentisering)
+- [Supabase](https://supabase.com) (for database)
+- [Resend](https://resend.com) (for e-postutsendelse)
 
-## Learn More
+## Oversikt over hoveddeler av applikasjonen
+- **Dashboard**: Viser statistikk og oversikt over utslipps- og kjøpsdata.  
 
-To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
+- **Utslippsdata (Emission Records)**: Administrasjon og forespørsel om utslippsdata for produkter.
+- **Kjøpsdata (Purchase Records)**: Registrering og administrasjon av kjøpsdata.
+- **Autentisering**: Alle brukere logger inn med Clerk.
+- **API**: tRPC-basert API for kommunikasjon mellom frontend og backend.
+- **Database**: Bruker Supabase med Prisma og Drizzle for datamodellering og spørringer.
+- **E-post**: Automatisk utsendelse av forespørsler om utslippsdata via Resend.
 
-- [Documentation](https://create.t3.gg/)
-- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
+## Prosedyre for demo
+1. Brukeren logger inn for første gang med Clerk. Før/etter dette må en rad i User-tabellen i Supabase lages for dem. Der må **authId** kopieres fra Clerk sitt dashboard. Det samme er ikke strengt tatt nødvendig for eposten deres.
 
-You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
+2. For å se produkter og deretter lage purchase records og emission records må en bruker kobles til en organisasjon gjennom UserOrganization (altså organisasjonen brukeren tilhører), og deretter vil dataen fra andre organisasjoner som er koblet til den første gjennom OrgRelation vises. Dette gjøres manuelt i Supabase.
 
-## How do I deploy this?
+For demonstrasjonsformål kan det være greit å ha et statisk "økosystem" av selskaper og produkter satt opp, også kan dere koble brukere opp mot den samme organisasjonen for å vise funksjonalitet.
 
-Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
 
-## TODO's
+## Teknisk oversikt
+Dette er en Nextjs applikasjon som bruker TRPC-prosedyrer sammen med Supabase for å hente og lage data, og for å sende eposter til de som skal fullføre emission records. Prosedyrer er beskyttet av Clerk.
 
-Wrap ClerkProvider around app when development starts
+Det er fire hoveddatatyper som hentes i backend: EmissionRecord, PurchaseRecord, Product og Organization. Når data hentes ut blir det noen ganger kombinert til en Enriched[Type], f.eks. EnrichedPurchaseRecord, som vil innehold nyttig data som id eller navn til produktet som har blitt kjøpt.
+
+Typene som brukes i prosjektet hentes automatisk fra Supabase gjennom en fil som heter database.types.ts.
+npx supabase gen types typescript --project-id "$PROJECT_REF" --schema public > database.types.ts
+
+Når en emission record blir laget i dashboardet vil en epost auto-sendes til eposten som ligger i Supabase under **organisasjonen** som eier produktet det samles data om.
+
+
+
+## Videreutvikling
+Invitasjonsprosess som automatiserer Clerk-Supabase kommunikasjonen når brukere skal onboardes.  
+Videre statistikk.

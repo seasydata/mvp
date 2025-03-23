@@ -2,6 +2,7 @@ import { type EnrichedEmissionRecord } from "~/server/api/routers/emissionrecord
 import SubmitData from "../submit-data";
 import { getHelper } from "~/app/_trpc/helper";
 import { notFound } from "next/navigation";
+import AlreadyFulfilled from "~/app/already-fulfilled";
 
 export default async function DataSubmission({
   params,
@@ -22,6 +23,7 @@ export default async function DataSubmission({
       await helper.emissionRecord.getSingle.fetch({
         emissionRecordId: recordId,
       });
+    if (emissionRecord.status === "fulfilled") { return AlreadyFulfilled() }
 
     if (!emissionRecord) {
       notFound();

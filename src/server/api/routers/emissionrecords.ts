@@ -100,7 +100,7 @@ export const emissionRecordRouter = createTRPCRouter({
           CO2e: z.number().nullable(),
           calculationMethod: z
             .string()
-            .pipe(z.enum(["AR4", "AR5", "AR6"]))
+            .pipe(z.enum(["Hybrid", "Industry Average"]))
             .nullable(),
           comment: z.string().nullable(),
         })
@@ -183,11 +183,12 @@ export const emissionRecordRouter = createTRPCRouter({
         CO2e: z.number(),
         calculationMethod: z
           .string()
-          .pipe(z.enum(["AR4", "AR5", "AR6"])),
+          .pipe(z.enum(["Hybrid", "Industry Average"])),
         comment: z.string().nullable(),
       })
     )
     .mutation(async ({ ctx, input }) => {
+      console.log(input.emissionId);
 
       const { error } = await ctx.supabase
         .from("EmissionRecord")

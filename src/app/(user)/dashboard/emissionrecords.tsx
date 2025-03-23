@@ -62,6 +62,18 @@ const columns: ColumnDef<EnrichedEmissionRecord>[] = [
     },
   },
   {
+    accessorKey: "calculationMethod",
+    header: "Calculation Method",
+    cell: ({ row }) => {
+      const method = row.getValue("calculationMethod");
+      return method ? (
+        <div className="text-left font-medium">{method as string}</div>
+      ) : (
+        <div className="text-left text-gray-500">-</div>
+      );
+    },
+  },
+  {
     accessorKey: "source",
     header: "Source",
     cell: ({ row }) => {
@@ -128,7 +140,7 @@ export default function EmissionRecords({
         <EmissionRecordDialog purchaseRecords={purchaseRecords} />
       </div>
 
-      <Tabs defaultValue="requested" className="w-full">
+      <Tabs defaultValue="fulfilled" className="w-full">
         <TabsList className="grid grid-cols-3 mb-4 text-xs sm:text-sm">
           <TabsTrigger
             value="requested"
@@ -140,7 +152,7 @@ export default function EmissionRecords({
             value="fulfilled"
             className="data-[state=active]:bg-green-100"
           >
-            fulfilled ({fulfilledRecords.length})
+            Fulfilled ({fulfilledRecords.length})
           </TabsTrigger>
           <TabsTrigger
             value="draft"

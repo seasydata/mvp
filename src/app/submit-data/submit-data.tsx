@@ -45,12 +45,18 @@ export default function SubmitData({
 }: {
   emissionRecord: EnrichedEmissionRecord;
 }) {
-  const fulfillEmissionRecord = trpc.emissionRecord.fulfill.useMutation()
+  const utils = trpc.useUtils()
+  const fulfillEmissionRecord = trpc.emissionRecord.fulfill.useMutation({
+    async onSuccess() {
+      await utils.emissionRecord.getSingle.invalidate();
+    },
+  })
+
   const formSchema = z.object({
     productId: z.string(),
     recordDate: z.date(),
     source: z.string(),
-    calculationMethod: z.enum(["AR4", "AR5", "AR6"]),
+    calculationMethod: z.enum(["Hybrid", "Industry Average"]),
     comment: z.string(),
     CO2e: z.number().positive("CO2e must be a positive number"),
   });
@@ -204,7 +210,7 @@ export default function SubmitData({
                           className="border-gray-200"
                           {...field}
                           onChange={(e) =>
-                            field.onChange(parseFloat(e.target.value))
+                            field.onChange(e.target.value === "" ? "" : parseFloat(e.target.value))
                           }
                         />
                       </FormControl>
@@ -232,14 +238,13 @@ export default function SubmitData({
                             <SelectValue placeholder="Select a method" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="AR4">AR4</SelectItem>
-                            <SelectItem value="AR5">AR5</SelectItem>
-                            <SelectItem value="AR6">AR6</SelectItem>
+                            <SelectItem value="Hybrid">Hybrid</SelectItem>
+                            <SelectItem value="Industry Average">Industry Average</SelectItem>
                           </SelectContent>
                         </Select>
                       </FormControl>
                       <FormDescription className="text-gray-500 text-sm">
-                        IPCC Assessment Report version used for calculations
+                        {/* IPCC Assessment Report version used for calculations */}
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
