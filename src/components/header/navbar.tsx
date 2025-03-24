@@ -19,7 +19,7 @@ const Navbar: React.FC = () => {
   const router = useRouter();
 
   return (
-    <nav className="w-full h-[137px] bg-[#FBFBFB] shadow-none sticky top-0 z-50 px-16">
+    <nav className="w-full h-[137px] bg-[#FBFBFB] shadow-none z-50 px-16 fixed top-0">
       <div className="mx-auto flex items-center justify-between h-full">
         <div>
           <Link href={"/"}>
