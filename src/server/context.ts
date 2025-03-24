@@ -1,4 +1,4 @@
-import {auth} from '@clerk/nextjs/server'
+import { auth } from '@clerk/nextjs/server'
 import { supabase } from './supabase'
 
 
@@ -8,3 +8,5 @@ export const createContext = async () => {
 }
 
 export type Context = Awaited<ReturnType<typeof createContext>>
+
+

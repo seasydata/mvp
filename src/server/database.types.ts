@@ -7,31 +7,6 @@ export type Json =
   | Json[]
 
 export type Database = {
-  graphql_public: {
-    Tables: {
-      [_ in never]: never
-    }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      graphql: {
-        Args: {
-          operationName?: string
-          query?: string
-          variables?: Json
-          extensions?: Json
-        }
-        Returns: Json
-      }
-    }
-    Enums: {
-      [_ in never]: never
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
-  }
   public: {
     Tables: {
       EmissionRecord: {
@@ -167,7 +142,6 @@ export type Database = {
           organizationId: string
           productId: string
           productName: string
-          purchaseDate: string | null
           unit: string
           updatedAt: string
         }
@@ -178,7 +152,6 @@ export type Database = {
           organizationId: string
           productId?: string
           productName: string
-          purchaseDate?: string | null
           unit: string
           updatedAt: string
         }
@@ -189,7 +162,6 @@ export type Database = {
           organizationId?: string
           productId?: string
           productName?: string
-          purchaseDate?: string | null
           unit?: string
           updatedAt?: string
         }
@@ -267,7 +239,7 @@ export type Database = {
           createdAt: string
           email: string
           id: string
-          organizations: string[] | null
+          organizations: string | null
           updatedAt: string | null
         }
         Insert: {
@@ -275,7 +247,7 @@ export type Database = {
           createdAt?: string
           email: string
           id?: string
-          organizations?: string[] | null
+          organizations?: string | null
           updatedAt?: string | null
         }
         Update: {
@@ -283,10 +255,18 @@ export type Database = {
           createdAt?: string
           email?: string
           id?: string
-          organizations?: string[] | null
+          organizations?: string | null
           updatedAt?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "User_organizations_fkey"
+            columns: ["organizations"]
+            isOneToOne: false
+            referencedRelation: "Organization"
+            referencedColumns: ["organizationId"]
+          },
+        ]
       }
       UserOrganization: {
         Row: {

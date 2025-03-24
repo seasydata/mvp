@@ -14,7 +14,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "./../../components/ui/table";
+} from "./table";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -39,7 +39,7 @@ export function DataTable<TData, TValue>({
             <TableRow key={headerGroup.id}>
               {headerGroup.headers.map((header) => {
                 return (
-                  <TableHead className='text-2xl ' key={header.id}>
+                  <TableHead className="font-semibold" key={header.id}>
                     {header.isPlaceholder
                       ? null
                       : flexRender(
