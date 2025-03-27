@@ -12,6 +12,8 @@ export type EnrichedPurchaseRecord = PurchaseRecord & {
   productId: string;
   productName: string;
   description: string;
+  comment: string;
+  unit: string;
 };
 
 export const purchaseRecordRouter = createTRPCRouter({
@@ -53,7 +55,7 @@ export const purchaseRecordRouter = createTRPCRouter({
       .from("PurchaseRecord")
       .select(`
       *,
-      ...Product!inner(productId, productName, description,
+      ...Product!inner(productId, productName, description, unit,
         ...Organization!inner(organizationId, organizationName)
         )`)
       .in("Product.Organization.organizationId", flatIds);

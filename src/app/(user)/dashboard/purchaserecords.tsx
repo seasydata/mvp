@@ -20,13 +20,25 @@ const columns: ColumnDef<EnrichedPurchaseRecord>[] = [
     ),
   },
   {
+    accessorKey: "organizationName",
+    header: "Supplier",
+    cell: ({ row }) => {
+      const name: string = row.getValue("organizationName");
+      return name ? (
+        <div className="max-w-[120px] text-wrap sm:max-w-full truncate" title={name}>
+          {name}
+        </div>
+      ) : null;
+    },
+  },
+  {
     accessorKey: "description",
     header: "Description",
     cell: ({ row }) => {
       const description: string = row.getValue("description");
       return description ? (
         <div
-          className="sm:max-w-[250px] truncate lg:max-w-[400px] xl:max-w-[400px]"
+          className="text-wrap truncate lg-and-up:max-w-[300px]"
           title={description}
         >
           {description}
@@ -35,6 +47,20 @@ const columns: ColumnDef<EnrichedPurchaseRecord>[] = [
         <div className="text-gray-500 italic">No description</div>
       );
     },
+  },
+  {
+    accessorKey: "quantity",
+    header: "Quantity",
+    cell: ({ row }) => (
+      <div className="text-left font-medium">{row.getValue("quantity")}</div>
+    ),
+  },
+  {
+    accessorKey: "unit",
+    header: "Unit",
+    cell: ({ row }) => (
+      <div className="text-left font-medium">{row.getValue("unit")}</div>
+    ),
   },
   {
     accessorKey: "purchaseDate",
@@ -49,27 +75,19 @@ const columns: ColumnDef<EnrichedPurchaseRecord>[] = [
     },
   },
   {
-    accessorKey: "quantity",
-    header: "Quantity",
-    cell: ({ row }) => (
-      <div className="text-left font-medium">{row.getValue("quantity")}</div>
-    ),
-  },
-  {
     accessorKey: "comment",
     header: "Comment",
-  },
-  {
-    accessorKey: "organizationName",
-    header: "Supplier",
     cell: ({ row }) => {
-      const name: string = row.getValue("organizationName");
-      return name ? (
-        <div className="max-w-[120px] sm:max-w-full truncate" title={name}>
-          {name}
+      const comment: string = row.getValue("comment");
+      return comment ? (
+        <div
+          className="lg-and-up:max-w-[250px] truncate"
+          title={comment}
+        >
+          {comment}
         </div>
       ) : null;
-    },
+    }
   },
 ];
 
@@ -84,6 +102,14 @@ export default function PurchaseRecords({
 }) {
   const [filteredRecords, setFilteredRecords] = useState(purchaseRecords);
   const [searchTerm, setSearchTerm] = useState("");
+  filteredRecords.sort((a, b) => {
+    if (a.organizationName < b.organizationName) return -1;
+    if (a.organizationName > b.organizationName) return 1;
+    if (a.productName < b.productName) return 1;
+    if (a.productName > b.productName) return -1;
+    return 0;
+  });
+
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.toLowerCase();

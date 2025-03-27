@@ -11,23 +11,23 @@ import { capitalize } from "~/lib/utils";
 
 const columns: ColumnDef<EnrichedEmissionRecord>[] = [
   {
+    accessorKey: "organizationName",
+    header: "Supplier",
+    cell: ({ row }) => {
+      const name: string = row.getValue("organizationName");
+      return name ? (
+        <div className="max-w-[100px] truncate" title={name}>
+          {name}
+        </div>
+      ) : null;
+    },
+  },
+  {
     accessorKey: "productName",
     header: "Product",
     cell: ({ row }) => (
       <div className="font-medium">{row.getValue("productName")}</div>
     ),
-  },
-  {
-    accessorKey: "recordDate",
-    header: "Date recorded",
-    cell: ({ row }) => {
-      const date = row.getValue("recordDate");
-      return date ? (
-        <div className="text-sm text-gray-500">
-          {new Date(date as string).toLocaleDateString()}
-        </div>
-      ) : null;
-    },
   },
   {
     accessorKey: "status",
@@ -79,40 +79,63 @@ const columns: ColumnDef<EnrichedEmissionRecord>[] = [
     cell: ({ row }) => {
       const source: string = row.getValue("source");
       return source ? (
-        <div className="sm:max-w-[200px] xl:max-w-[300px] truncate" title={source}>
+        <div className="xl:max-w-[300px] truncate" title={source}>
           {source}
         </div>
       ) : null;
     },
   },
   {
-    accessorKey: "comment",
-    header: "Comment",
+    accessorKey: "consumerComment",
+    header: "Consumer comment",
     cell: ({ row }) => {
-      const comment: string = row.getValue("comment");
-      return comment ? (
+      const consumerComment: string = row.getValue("consumerComment");
+      return consumerComment ? (
         <div
-          className=" sm:max-w-[200px] lg:max-w-[250px] xl:max-w-[250px] truncate"
-          title={comment}
+          className="max-w-[250px] truncate"
+          title={consumerComment}
         >
-          {comment}
+          {consumerComment}
         </div>
       ) : null;
     },
   },
   {
-    accessorKey: "organizationName",
-    header: "Supplier",
+    accessorKey: "producerComment",
+    header: "Comment about product",
     cell: ({ row }) => {
-      const name: string = row.getValue("organizationName");
-      return name ? (
-        <div className="max-w-[100px] sm:max-w-[150px] truncate" title={name}>
-          {name}
+      const producerComment: string = row.getValue("producerComment");
+      return producerComment ? (
+        <div
+          className="max-w-[250px] truncate"
+          title={producerComment}
+        >
+          {producerComment}
+        </div>
+      ) : null;
+    },
+  },
+  {
+    accessorKey: "recordDate",
+    header: "Date recorded",
+    cell: ({ row }) => {
+      const date = row.getValue("recordDate");  
+      return date ? (
+        <div className="text-sm text-gray-500">
+          {new Date(date as string).toLocaleDateString()}
         </div>
       ) : null;
     },
   },
 ];
+
+const requestedColumns = columns.filter(
+  (column) => column.id && ["organizationName", "productName", "consumerComment", "recordDate"].includes(column.id)
+);
+
+const fulfilledColumns = columns.filter(
+  (column) => column.id && ["organizationName", "productName", "CO2e", "calculationMethod", "source", "consumerComment", "producerComment", "recordDate"].includes(column.id)
+);
 
 export default function EmissionRecords({
   emissionRecords,
@@ -121,27 +144,39 @@ export default function EmissionRecords({
   emissionRecords: EnrichedEmissionRecord[];
   purchaseRecords: EnrichedPurchaseRecord[];
 }) {
+  console.log(columns)
+  emissionRecords.sort((a, b) => {
+    if (a.organizationName < b.organizationName) return -1;
+    else if (a.organizationName > b.organizationName) return 1;
+    else if (a.status == "fulfilled") return -1;
+    else if (b.status == "fulfilled") return 1;
+    else return 0;
+  });
+
   const requestedRecords = emissionRecords.filter(
     (record) => record.status === "requested",
   );
   const fulfilledRecords = emissionRecords.filter(
     (record) => record.status === "fulfilled",
   );
-  const draftRecords = emissionRecords.filter(
-    (record) => record.status === "draft",
-  );
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div className="flex flex-col justify-between gap-4">
         <h2 className="text-xl font-semibold text-cyan-900">
           Emission Records
         </h2>
         <EmissionRecordDialog purchaseRecords={purchaseRecords} />
       </div>
 
-      <Tabs defaultValue="fulfilled" className="w-full">
-        <TabsList className="grid grid-cols-3 mb-4 text-xs sm:text-sm">
+      <Tabs defaultValue="all" className="w-full">
+        <TabsList className="grid grid-cols-3 mb-4 text-xs">
+          <TabsTrigger
+            value="all"
+            className="data-[state=active]:bg-blue-100"
+          >
+            All ({emissionRecords.length})
+          </TabsTrigger>
           <TabsTrigger
             value="requested"
             className="data-[state=active]:bg-amber-100"
@@ -154,18 +189,24 @@ export default function EmissionRecords({
           >
             Fulfilled ({fulfilledRecords.length})
           </TabsTrigger>
-          <TabsTrigger
-            value="draft"
-            className="data-[state=active]:bg-blue-100"
-          >
-            Drafts ({draftRecords.length})
-          </TabsTrigger>
         </TabsList>
+
+        <TabsContent value="all" className="mt-0">
+          <div className="overflow-x-auto">
+            {emissionRecords.length > 0 ? (
+              <DataTable columns={columns} data={emissionRecords} />
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                No emission records records found
+              </div>
+            )}
+          </div>
+        </TabsContent>
 
         <TabsContent value="requested" className="mt-0">
           <div className="overflow-x-auto">
             {requestedRecords.length > 0 ? (
-              <DataTable columns={columns} data={requestedRecords} />
+              <DataTable columns={requestedColumns} data={requestedRecords} />
             ) : (
               <div className="text-center py-8 text-gray-500">
                 No requested emission records found
@@ -177,22 +218,10 @@ export default function EmissionRecords({
         <TabsContent value="fulfilled" className="mt-0">
           <div className="overflow-x-auto">
             {fulfilledRecords.length > 0 ? (
-              <DataTable columns={columns} data={fulfilledRecords} />
+              <DataTable columns={fulfilledColumns} data={fulfilledRecords} />
             ) : (
               <div className="text-center py-8 text-gray-500">
                 No fulfilled emission records found
-              </div>
-            )}
-          </div>
-        </TabsContent>
-
-        <TabsContent value="draft" className="mt-0">
-          <div className="overflow-x-auto">
-            {draftRecords.length > 0 ? (
-              <DataTable columns={columns} data={draftRecords} />
-            ) : (
-              <div className="text-center py-8 text-gray-500">
-                No draft emission records found
               </div>
             )}
           </div>
