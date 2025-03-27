@@ -10,6 +10,7 @@ export type EnrichedEmissionRecord = EmissionRecord & {
   description: string;
   organizationId: string;
   organizationName: string;
+  consumerComment: string;
   producerComment: string;
 };
 
@@ -71,12 +72,12 @@ export const emissionRecordRouter = createTRPCRouter({
       .select(
         `
       *,
-      consumerComment:comment,
+      producerComment:comment,
       ...Product!inner (
         productName,
         productId,
         description,
-        producerComment:comment,
+        consumerComment:comment,
       ...Organization!inner(organizationId, organizationName)
       )`,
       )

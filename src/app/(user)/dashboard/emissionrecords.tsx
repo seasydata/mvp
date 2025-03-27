@@ -89,25 +89,25 @@ const columns: ColumnDef<EnrichedEmissionRecord>[] = [
     accessorKey: "consumerComment",
     header: "Consumer comment",
     cell: ({ row }) => {
-      const comment: string = row.getValue("consumerComment");
-      return comment ? (
+      const consumerComment: string = row.getValue("consumerComment");
+      return consumerComment ? (
         <div
-          className="lg-and-up:max-w-[250px] truncate"
-          title={comment}
+          className="max-w-[250px] truncate"
+          title={consumerComment}
         >
-          {comment}
+          {consumerComment}
         </div>
       ) : null;
     },
   },
   {
     accessorKey: "producerComment",
-    header: "Producer comment",
+    header: "Comment about product",
     cell: ({ row }) => {
       const producerComment: string = row.getValue("producerComment");
       return producerComment ? (
         <div
-          className="lg:max-w-[250px] xl:max-w-[250px] truncate"
+          className="max-w-[250px] truncate"
           title={producerComment}
         >
           {producerComment}
@@ -130,12 +130,11 @@ const columns: ColumnDef<EnrichedEmissionRecord>[] = [
 ];
 
 const requestedColumns = columns.filter(
-  (column) => ["organizationName", "productName", "consumerComment", "recordDate"].includes(column.accessorKey)
+  (column) => column.id && ["organizationName", "productName", "consumerComment", "recordDate"].includes(column.id)
 );
 
-
 const fulfilledColumns = columns.filter(
-  (column) => ["organizationName", "productName", "CO2e", "calculationMethod", "source", "consumerComment", "producerComment", "recordDate"].includes(column.accessorKey)
+  (column) => column.id && ["organizationName", "productName", "CO2e", "calculationMethod", "source", "consumerComment", "producerComment", "recordDate"].includes(column.id)
 );
 
 export default function EmissionRecords({
@@ -145,6 +144,7 @@ export default function EmissionRecords({
   emissionRecords: EnrichedEmissionRecord[];
   purchaseRecords: EnrichedPurchaseRecord[];
 }) {
+  console.log(columns)
   emissionRecords.sort((a, b) => {
     if (a.organizationName < b.organizationName) return -1;
     else if (a.organizationName > b.organizationName) return 1;
