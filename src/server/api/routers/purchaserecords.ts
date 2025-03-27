@@ -53,7 +53,8 @@ export const purchaseRecordRouter = createTRPCRouter({
       .from("PurchaseRecord")
       .select(`
       *,
-      ...Product!inner(productId, productName, description,
+      comment,
+      ...Product!inner(productId, productName, description, unit,
         ...Organization!inner(organizationId, organizationName)
         )`)
       .in("Product.Organization.organizationId", flatIds);

@@ -10,6 +10,7 @@ export type EnrichedEmissionRecord = EmissionRecord & {
   description: string;
   organizationId: string;
   organizationName: string;
+  producerComment: string;
 };
 
 export const emissionRecordRouter = createTRPCRouter({
@@ -53,7 +54,7 @@ export const emissionRecordRouter = createTRPCRouter({
       await ctx.supabase
         .from("Organization")
         .select(`
-        organizationId, 
+        organizationId,
         OrgRelation!inner!supplierOrgId(customerOrgId)
         `,
         )
@@ -70,10 +71,12 @@ export const emissionRecordRouter = createTRPCRouter({
       .select(
         `
       *,
+      consumerComment:comment,
       ...Product!inner (
         productName,
         productId,
         description,
+        producerComment:comment,
       ...Organization!inner(organizationId, organizationName)
       )`,
       )
