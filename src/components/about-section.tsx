@@ -4,7 +4,6 @@ import CustomButton from "./styles/custom-button";
 import Image from "next/image";
 import Heading from "./styles/heading";
 import BodyText from "./styles/body-text";
-import { Link } from "lucide-react";
 
 const AboutSection: React.FC = () => {
   const bodyTexts = [
