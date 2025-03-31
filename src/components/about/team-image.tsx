@@ -1,5 +1,6 @@
 import Image from "next/image";
-const Content1: React.FC = () => {
+
+const TeamImage: React.FC = () => {
   return (
     <section className="w-90% xl:w-full flex flex-col lg-and-up:flex-row justify-center my-8 lg:my-16">
       <Image
@@ -12,4 +13,4 @@ const Content1: React.FC = () => {
     </section>
   );
 };
-export default Content1;
+export default TeamImage;
