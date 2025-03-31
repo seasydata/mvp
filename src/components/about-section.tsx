@@ -1,7 +1,10 @@
+"use client";
+
 import CustomButton from "./styles/custom-button";
 import Image from "next/image";
 import Heading from "./styles/heading";
 import BodyText from "./styles/body-text";
+import { Link } from "lucide-react";
 
 const AboutSection: React.FC = () => {
   const bodyTexts = [
@@ -9,15 +12,6 @@ const AboutSection: React.FC = () => {
     "But don’t worry, we’ll guide you through it!",
     "Seasy Data helps you prep, reach out to suppliers, and we ensure you we will keep them happy. We make data collection easier for both you and your suppliers.",
     "Feel free to contact us for a meeting or a demo.",
-  ];
-
-  const buttons: {
-    label: string;
-    variant: "login" | "outlined" | "default";
-    className?: string;
-  }[] = [
-    { label: "Send e-mail", variant: "login", className: "uppercase" },
-    { label: "Book demo", variant: "outlined", className: "uppercase" },
   ];
 
   return (
@@ -48,15 +42,20 @@ const AboutSection: React.FC = () => {
         ))}
 
         <div className="flex justify-start space-x-8 py-2">
-          {buttons.map((btn, index) => (
+          <a href="mailto:anna.leonora@seasydata.com">
             <CustomButton
-              key={index}
-              variant={btn.variant}
-              className={btn.className}
-            >
-              {btn.label}
+              variant="login"
+              className="uppercase"
+              >
+              send email
             </CustomButton>
-          ))}
+          </a>
+          <CustomButton
+            variant="outlined"
+            className="uppercase"
+          >
+            Book demo
+          </CustomButton>
         </div>
       </div>
     </section>

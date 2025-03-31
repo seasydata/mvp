@@ -11,7 +11,7 @@ const ContributionSection: React.FC = () => {
         <div className="flex flex-row sm:flex-col justify-between gap-4">
           {/* First Block */}
           <div className="flex flex-row items-start gap-4">
-            <div className="text-[200px] font-extrabold text-[#F2F2F2] leading-none">
+            <div className="text-[200px] sm:text-[100px] font-extrabold text-[#F2F2F2] leading-none">
               1
             </div>
             <BodyText className="font-normal text-[22px] md:text-[18px] sm:text-[14px] leading-[36px] md:leading[18px] sm:leading-[24px] tracking-normal flex items-start pt-6">
@@ -23,7 +23,7 @@ const ContributionSection: React.FC = () => {
 
           {/* Second Block */}
           <div className="flex flex-row items-start gap-4">
-            <div className="text-[200px] font-extrabold text-[#F2F2F2] leading-none">
+            <div className="text-[200px] sm:text-[100px] font-extrabold text-[#F2F2F2] leading-none">
               2
             </div>
             <BodyText className="font-normal text-[22px] md:text-[18px] sm:text-[14px] leading-[36px] md:leading[18px] sm:leading-[24px] tracking-normal flex items-start pt-6">

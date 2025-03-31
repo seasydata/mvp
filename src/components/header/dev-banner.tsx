@@ -1,4 +1,5 @@
-"use client"
+"use client";
+
 import { useState } from "react";
 import { X } from "lucide-react";
 import BodyText from "../styles/body-text";
@@ -12,8 +13,7 @@ const DevBanner: React.FC = () => {
     <div className="bg-[#36F1CD] text-black text-sm py-2 px-4 flex justify-between items-center fixed top-[137px] w-full shadow-md z-40">
       <span>
         <BodyText className="font-normal text-[12px] leading-[12px] tracking-[0.2em] uppercase">
-          Hello! Our website is under construction. changes are happening, stay
-          tuned!
+          Hello! Our website is under construction. changes are happening, stay tuned!
         </BodyText>
       </span>
       <button

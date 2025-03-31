@@ -1,6 +1,6 @@
 import BodyText from "../styles/body-text";
 
-const Content2: React.FC = () => {
+const TeamInfo: React.FC = () => {
   return (
     <section className="relative w-full py-6 px-6 sm:px-8 md:px-12 lg:px-16 xl:px-32 flex justify-center">
       <div className="w-[917px] max-w-full text-center flex flex-col justify-center items-center gap-6">
@@ -16,4 +16,4 @@ const Content2: React.FC = () => {
     </section>
   );
 };
-export default Content2;
+export default TeamInfo;

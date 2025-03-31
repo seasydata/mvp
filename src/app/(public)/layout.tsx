@@ -8,7 +8,7 @@ export default function publicLayout({
     return (<>
             <Navbar />
             <DevBanner />
-            <main className="w-4/5 mx-auto">
+            <main className="lg-and-up:py-12 pb-12">
                 {children}
             </main>
             <Footer />
