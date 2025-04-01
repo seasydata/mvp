@@ -13,6 +13,18 @@ import { Search } from "lucide-react";
 
 const columns: ColumnDef<EnrichedPurchaseRecord>[] = [
   {
+    accessorKey: "organizationName",
+    header: "Supplier",
+    cell: ({ row }) => {
+      const name: string = row.getValue("organizationName");
+      return name ? (
+        <div className="max-w-[120px] sm:max-w-full truncate" title={name}>
+          {name}
+        </div>
+      ) : null;
+    },
+  },
+  {
     accessorKey: "productName",
     header: "Product",
     cell: ({ row }) => (
@@ -58,18 +70,6 @@ const columns: ColumnDef<EnrichedPurchaseRecord>[] = [
   {
     accessorKey: "comment",
     header: "Comment",
-  },
-  {
-    accessorKey: "organizationName",
-    header: "Supplier",
-    cell: ({ row }) => {
-      const name: string = row.getValue("organizationName");
-      return name ? (
-        <div className="max-w-[120px] sm:max-w-full truncate" title={name}>
-          {name}
-        </div>
-      ) : null;
-    },
   },
 ];
 
