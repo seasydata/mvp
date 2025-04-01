@@ -121,6 +121,14 @@ export default function EmissionRecords({
   emissionRecords: EnrichedEmissionRecord[];
   purchaseRecords: EnrichedPurchaseRecord[];
 }) {
+  emissionRecords.sort((a, b) => {
+    if (a.organizationName < b.organizationName) return -1;
+    if (a.organizationName > b.organizationName) return 1;
+    if (a.status == "fulfilled") return -1;
+    if (b.status == "fulfilled") return 1;
+    return 0;
+  });
+
   const requestedRecords = emissionRecords.filter(
     (record) => record.status === "requested",
   );
@@ -135,7 +143,7 @@ export default function EmissionRecords({
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <h2 className="text-xl font-semibold text-cyan-900">
-          Emission Records
+          Request Emissions Data
         </h2>
         <EmissionRecordDialog purchaseRecords={purchaseRecords} />
       </div>
@@ -144,19 +152,19 @@ export default function EmissionRecords({
         <TabsList className="grid grid-cols-3 mb-4 text-xs sm:text-sm">
           <TabsTrigger
             value="requested"
-            className="data-[state=active]:bg-amber-100"
+            className="data-[state=active]:bg-amber-300"
           >
             Requested ({requestedRecords.length})
           </TabsTrigger>
           <TabsTrigger
             value="fulfilled"
-            className="data-[state=active]:bg-green-100"
+            className="data-[state=active]:bg-green-300"
           >
             Gathered data ({fulfilledRecords.length})
           </TabsTrigger>
           <TabsTrigger
             value="draft"
-            className="data-[state=active]:bg-blue-100"
+            className="data-[state=active]:bg-blue-300"
           >
             Drafts ({draftRecords.length})
           </TabsTrigger>

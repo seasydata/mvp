@@ -82,6 +82,15 @@ export default function PurchaseRecords({
   organizations: Organization[];
   products: EnrichedProduct[];
 }) {
+  purchaseRecords.sort((a, b) => {
+    if (a.organizationName < b.organizationName) return -1;
+    if (a.organizationName > b.organizationName) return 1;
+    if (a.productName < b.productName) return -1;
+    if (a.productName > b.productName) return 1;
+    if (a.purchaseDate < b.purchaseDate) return -1;
+    if (a.purchaseDate > b.purchaseDate) return 1;
+    return 0;
+  });
   const [filteredRecords, setFilteredRecords] = useState(purchaseRecords);
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -108,7 +117,7 @@ export default function PurchaseRecords({
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <h2 className="text-xl font-semibold text-cyan-900">
-          Purchase Records
+          Overview of Procurements
         </h2>
         <PurchaseRecordDialog
           organizations={organizations}
