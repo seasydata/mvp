@@ -11,6 +11,18 @@ import { capitalize } from "~/lib/utils";
 
 const columns: ColumnDef<EnrichedEmissionRecord>[] = [
   {
+    accessorKey: "organizationName",
+    header: "Supplier",
+    cell: ({ row }) => {
+      const name: string = row.getValue("organizationName");
+      return name ? (
+        <div className="max-w-[100px] sm:max-w-[150px] truncate" title={name}>
+          {name}
+        </div>
+      ) : null;
+    },
+  },
+  {
     accessorKey: "productName",
     header: "Product",
     cell: ({ row }) => (
@@ -100,18 +112,6 @@ const columns: ColumnDef<EnrichedEmissionRecord>[] = [
       ) : null;
     },
   },
-  {
-    accessorKey: "organizationName",
-    header: "Supplier",
-    cell: ({ row }) => {
-      const name: string = row.getValue("organizationName");
-      return name ? (
-        <div className="max-w-[100px] sm:max-w-[150px] truncate" title={name}>
-          {name}
-        </div>
-      ) : null;
-    },
-  },
 ];
 
 export default function EmissionRecords({
@@ -152,7 +152,7 @@ export default function EmissionRecords({
             value="fulfilled"
             className="data-[state=active]:bg-green-100"
           >
-            Fulfilled ({fulfilledRecords.length})
+            Gathered data ({fulfilledRecords.length})
           </TabsTrigger>
           <TabsTrigger
             value="draft"
